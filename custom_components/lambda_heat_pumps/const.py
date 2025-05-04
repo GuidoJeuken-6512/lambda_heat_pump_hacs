@@ -23,12 +23,18 @@ DEFAULT_HOT_WATER_MAX_TEMP = 60
 
 # Configuration Constants
 CONF_SLAVE_ID = "slave_id"
-CONF_ROOM_TEMPERATURE_ENTITY = "room_temperature_entity_{0}"  # Format string for room_temperature_entity_1, _2, etc.
+CONF_ROOM_TEMPERATURE_ENTITY = "room_temperature_entity_{0}"
+# Format string for room_temperature_entity_1, _2, etc.
 
 # Debug and Logging
 DEBUG = False
 DEBUG_PREFIX = "lambda_wp"
-LOG_LEVELS = {"error": "ERROR", "warning": "WARNING", "info": "INFO", "debug": "DEBUG"}
+LOG_LEVELS = {
+    "error": "ERROR",
+    "warning": "WARNING",
+    "info": "INFO",
+    "debug": "DEBUG"
+}
 
 # Firmware Versions
 FIRMWARE_VERSION = {
@@ -66,10 +72,23 @@ HC_BASE_ADDRESS = {1: 5000, 2: 5100, 3: 5200, 4: 5300, 5: 5400}
 AMBIENT_OPERATING_STATE = {0: "Off", 1: "Automatik", 2: "Manual", 3: "Error"}
 
 # E-Manager States
-EMGR_OPERATING_STATE = {0: "Off", 1: "Automatik", 2: "Manual", 3: "Error", 4: "Offline"}
+EMGR_OPERATING_STATE = {
+    0: "Off",
+    1: "Automatik",
+    2: "Manual",
+    3: "Error",
+    4: "Offline"
+}
 
 # Heat Pump States
-HP_ERROR_STATE = {0: "OK", 1: "Message", 2: "Warning", 3: "Alarm", 4: "Fault"}
+HP_ERROR_STATE = {
+    0: "OK",
+    1: "Message",
+    2: "Warning",
+    3: "Alarm",
+    4: "Fault"
+}
+
 
 HP_STATE = {
     0: "Init",
@@ -906,7 +925,8 @@ SENSOR_TYPES = {
 }
 
 # Room Temperature Settings
-ROOM_TEMPERATURE_REGISTER_OFFSET = 4  # Register offset for room temperature within a HC
+ROOM_TEMPERATURE_REGISTER_OFFSET = 4
+# Register offset for room temperature within a HC
 ROOM_TEMPERATURE_UPDATE_INTERVAL = (
     1  # Update interval for room temperature (in minutes)
 )
