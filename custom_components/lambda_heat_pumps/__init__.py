@@ -14,7 +14,8 @@ from .services import async_setup_services, async_unload_services
 _LOGGER = logging.getLogger(__name__)
 SCAN_INTERVAL = timedelta(seconds=30)
 
-# Diese Konstante teilt Home Assistant mit, dass die Integration Übersetzungen hat
+# Diese Konstante teilt Home Assistant mit, d
+# ass die Integration Übersetzungen hat
 TRANSLATION_SOURCES = {DOMAIN: "translations"}
 
 
@@ -48,7 +49,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     hass.data[DOMAIN][entry.entry_id] = {"coordinator": coordinator}
 
     # Set up all platforms
-    await hass.config_entries.async_forward_entry_setups(entry, ["sensor", "climate"])
+    await hass.config_entries.async_forward_entry_setups(
+        entry, ["sensor", "climate"]
+    )
 
     # Beim ersten Setup die Services registrieren
     if len(hass.data[DOMAIN]) == 1:
@@ -82,7 +85,8 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
             await async_unload_services(hass)
     else:
         _LOGGER.debug(
-            "Entry %s not in hass.data[%s], nothing to remove.", entry.entry_id, DOMAIN
+            "Entry %s not in hass.data[%s], nothing to remove.",
+            entry.entry_id, DOMAIN
         )
     return unload_ok
 
