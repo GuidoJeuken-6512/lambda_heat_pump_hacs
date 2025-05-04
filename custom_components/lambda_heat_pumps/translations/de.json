@@ -1,0 +1,69 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Lambda WP Einrichtung",
+        "description": "Konfigurieren Sie Ihr Lambda WP Gerät.",
+        "data": {
+          "name": "Name",
+          "host": "Host",
+          "port": "Port",
+          "slave_id": "Slave-ID",
+          "firmware_version": "Firmware-Version",
+          "debug_mode": "Debug-Modus",
+          "num_hps": "Anzahl der Wärmepumpen",
+          "num_boil": "Anzahl der Warmwasser Speicher",
+          "num_hc": "Anzahl der Heizkreise",
+          "num_buffer": "Anzahl der Pufferspeicher",
+          "num_solar": "Anzahl der Solarmodule"
+        }
+      },
+      "room_sensor": {
+        "title": "Raumtemperatur-Sensoren wählen",
+        "description": "Wählen Sie einen Temperatursensor für jeden Heizkreis. Lassen Sie das Feld leer, um für diesen Heizkreis keinen Sensor zu verwenden.",
+        "data": {
+          "room_temperature_entity_1": "Raumtemperatur-Sensor für Heizkreis 1",
+          "room_temperature_entity_2": "Raumtemperatur-Sensor für Heizkreis 2",
+          "room_temperature_entity_3": "Raumtemperatur-Sensor für Heizkreis 3",
+          "room_temperature_entity_4": "Raumtemperatur-Sensor für Heizkreis 4",
+          "room_temperature_entity_5": "Raumtemperatur-Sensor für Heizkreis 5"
+        }
+      }
+    },
+    "error": {
+      "unknown": "Unbekannter Fehler aufgetreten.",
+      "cannot_connect": "Verbindung zum Gerät fehlgeschlagen.",
+      "no_temp_sensors": "Keine Temperatursensoren gefunden. Bitte richten Sie zuerst einen Temperatursensor ein."
+    },
+    "options": {
+      "step": {
+        "init": {
+          "title": "Lambda WP Optionen",
+          "data": {
+            "hot_water_min_temp": "Warmwasser Mindesttemperatur",
+            "hot_water_max_temp": "Warmwasser Maximaltemperatur",
+            "heating_circuit_min_temp": "Heizkreis Mindesttemperatur",
+            "heating_circuit_max_temp": "Heizkreis Maximaltemperatur",
+            "update_interval": "Update-Intervall (Sekunden)",
+            "firmware_version": "Firmware-Versionen",
+            "room_thermostat_control": "Raumthermostat-Steuerung"
+          }
+        }
+      }
+    }
+  },
+  "climate": {
+    "hot_water": "Warmwasser",
+    "heating_circuit": "Heizkreis",
+    "current_temperature": "Aktuelle Temperatur",
+    "target_temperature": "Soll-Temperatur",
+    "min_temp": "Minimale Temperatur",
+    "max_temp": "Maximale Temperatur",
+    "set_temperature": "Temperatur einstellen",
+    "hvac_mode_heat": "Heizen",
+    "hvac_modes": "Modi",
+    "error_set_temp_failed": "Setzen der Zieltemperatur fehlgeschlagen."
+  },
+  "room_thermostat_control": "Raumthermostat-Steuerung",
+  "room_thermostat_control_tooltip": "Hiermit wird die Raumthermostat-Steuerung für die Lambda Wärmepumpe aktiviert. Bitte ggf. in der Hilfe nachsehen."
+}

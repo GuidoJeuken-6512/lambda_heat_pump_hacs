@@ -1,0 +1,5 @@
+## Übersetzungen funktionieren nicht sauber.
+
+## Services ausbauen, Modbus read / write
+
+

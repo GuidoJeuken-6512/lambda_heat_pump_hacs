@@ -1,0 +1,11 @@
+update_room_temperature:
+  name: Update Room Temperature
+  description: "Updates the room temperature from a selected sensor to the Lambda heat pump Modbus register."
+  fields:
+    entity_id:
+      name: Entity ID
+      description: Entity ID of the Lambda heat pump. If omitted, all Lambda integrations with room thermostat control enabled will be updated.
+      required: false
+      selector:
+        entity:
+          integration: lambda 

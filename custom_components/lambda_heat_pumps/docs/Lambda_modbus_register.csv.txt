@@ -1,0 +1,69 @@
+Modul,Index,Subindex,Number,Register name,Read / Write,Data format,Unit,Register description
+General Ambient,0,0,00,Error number,RO,INT16,[Nr],0 = No Error
+General Ambient,0,0,01,Operating state,RO,UINT16,[Nr],0 = OFF, 1 = AUTOMATIK, 2 = MANUAL, 3 = ERROR
+General Ambient,0,0,02,Actual ambient temp.,RW,INT16,[0.1°C],Actual ambient temperature (min = -50.0°C; max = 80.0°C)
+General Ambient,0,0,03,Average ambient temp. 1h,RO,INT16,[0.1°C],Arithmetic average temperature of the last 60 minutes
+General Ambient,0,0,04,Calculated ambient temp.,RO,INT16,[0.1°C],Temperature for calculations in heat distribution modules
+General E-Manager,0,1,00,Error number,RO,INT16,[Nr],0 = No Error
+General E-Manager,0,1,01,Operating state,RO,UINT16,[Nr],0 = OFF, 1 = AUTOMATIK, 2 = MANUAL, 3 = ERROR, 4 = OFFLINE
+General E-Manager,0,1,02,Actual power (input or excess),RW,UINT16 or INT16,[Watt],Actual input power [UINT16 (min = 0W; max = 65535W)] or actual excess power [INT16 (min = -32768W; max = 32767W)] (depends on settings in Module)
+General E-Manager,0,1,03,Actual power consumption,RO,INT16,[Watt],Actual power consumption of all configurated heat pumps
+General E-Manager,0,1,04,Power consumption setpoint,RO,INT16,[Watt],Power consumtion setpoint as a sum for for all heat pumps
+Heat pump,1,0-2,00,Hp Error state,RO,UINT16,[Nr],0 = NONE, 1 = MESSAGE, 2 = WARNING, 3 = ALARM, 4 = FAULT
+Heat pump,1,0-2,01,Hp Error number,RO,INT16,[Nr],Scrolling through all active error numbers (Nr.1 - Nr.99)
+Heat pump,1,0-2,02,Hp State,RO,UINT16,[Nr],0 = INIT, 1 = REFERENCE, 2 = RESTART-BLOCK, 3 = READY, 4 = START PUMPS, 5 = START COMPRESSOR, 6 = PRE-REGULATION, 7 = REGULATION, 8 = Not Used, 9 = COOLING, 10 = DEFROSTING, 20 = STOPPING, 30 = FAULT-LOCK, 31 = ALARM-BLOCK, 40 = ERROR-RESET
+Heat pump,1,0-2,03,Operating state,RO,UINT16,[Nr],0 = STBY, 1 = CH, 2 = DHW, 3 = CC, 4 = CIRCULATE, 5 = DEFROST, 6 = OFF, 7 = FROST, 8 = STBY-FROST, 9 = Not used, 10 = SUMMER, 11 = HOLIDAY, 12 = ERROR, 13 = WARNING, 14 = INFO-MESSAGE, 15 = TIME-BLOCK, 16 = RELEASE-BLOCK, 17 = MINTEMP-BLOCK, 18 = FIRMWARE-DOWNLOAD
+Heat pump,1,0-2,04,T-flow,RO,INT16,[0.01°C],Flow line temperature
+Heat pump,1,0-2,05,T-return,RO,INT16,[0.01°C],Return line temperature
+Heat pump,1,0-2,06,Vol. sink,RO,INT16,[0.01l/min],Volume flow heat sink
+Heat pump,1,0-2,07,T-EQin,RO,INT16,[0.01°C],Energy source inlet temperature
+Heat pump,1,0-2,08,T-EQout,RO,INT16,[0.01°C],Energy sorurce outlet temperature
+Heat pump,1,0-2,09,Vol. source,RO,INT16,[0.01l/min],Volume flow energy source
+Heat pump,1,0-2,10,Compressor-Rating,RO,UINT16,[0.01%],Compressor unit rating
+Heat pump,1,0-2,11,Qp heating,RO,INT16,[0.1kW],Actual heating capacity 
+Heat pump,1,0-2,12,FI power consumption,RO,INT16,[Watt],Frequency inverter actual power consumption
+Heat pump,1,0-2,13,COP,RO,INT16,[0.01%],Coefficient of performance
+Heat pump,1,0-2,14,Modbus request release password,RW,UINT16,[Nr],Password register to release modbus request registers (maximum 10 retries are possieble)
+Heat pump,1,0-2,15,Request type,RW,INT16,[Nr],0 = NO REQUEST, 1 = FLOW PUMP CIRCULATION, 2 = CENTRAL HEATING, 3 = CENTRAL COOLING, 4 = DOMESTIC HOT WATER
+Heat pump,1,0-2,16,Request flow line temp,RW,INT16,[0.1°C],Requested flow line temperature. (min = 0.0°C, max = 70.0°C)
+Heat pump,1,0-2,17,Request return line temp,RW,INT16,[0.1°C],Requested return line temperature. (min = 0.0°C, max = 65.0°C)
+Heat pump,1,0-2,18,Request heat sink temp. diff,RW,INT16,[0.1K],Requested temperature difference between flow line and return line. (min = 0.0K, max = 35.0K)
+Heat pump,1,0-2,19,Relais state for 2nd heating stage,RO,INT16,"0/1",1 = NO-Relais for 2nd heating stage is activated
+Heat pump,1,0-2,20,Statistic VdA E since last reset,RO,INT32,[Wh],Accumulated electrical energy consumption of compressor unit since last statistic reset
+Heat pump,1,0-2,21,Statistic VdA Q since last reset,RO,INT32,[Wh],Accumulated thermal energy output of compressor unit since last statistic reset
+Boiler,2,0-4,00,Error number,RO,INT16,[Nr],0 = No Error
+Boiler,2,0-4,01,Operating state,RO,UINT16,[Nr],0 = STBY, 1 = DHW, 2 = LEGIO, 3 = SUMMER, 4 = FROST, 5 = HOLIDAY, 6 = PRIO-STOP, 7 = ERROR, 8 = OFF, 9 = PROMPT-DHW, 10 = TRAILING-STOP, 11 = TEMP-LOCK, 12 = STBY-FROST
+Boiler,2,0-4,02,Actual high temp.,RO,INT16,[0.1°C],Actual temperature boiler high sensor
+Boiler,2,0-4,03,Actual low temp.,RO,INT16,[0.1°C],Actual temperature boiler low sensor
+Boiler,2,0-4,04,Actual circulation temp.,RO,INT16,[0.1°C],Actual temperature circulation sensor
+Boiler,2,0-4,05,Actual circulation pump state,RO,INT16,"0/1",Actual state of circulation pump [0 = OFF, 1 = ON]
+Boiler,2,0-4,50,Set.: Maximum boiler temp.,RW,INT16,[0.1°C],Setting for maximum boiler temperature (min = 25.0°C; max = 65.0°C)
+Buffer,3,0-4,00,Error number,RO,INT16,[Nr],0 = No Error
+Buffer,3,0-4,01,Operating state,RO,UINT16,[Nr],0 = STBY, 1 = HEATING, 2 = COOLING, 3 = SUMMER, 4 = FROST, 5 = HOLIDAY, 6 = PRIO-STOP, 7 = ERROR, 8 = OFF, 9 = STBY-FROST
+Buffer,3,0-4,02,Actual high temp.,RO,INT16,[0.1°C],Actual temperature buffer high sensor
+Buffer,3,0-4,03,Actual low temp.,RO,INT16,[0.1°C],Actual temperature buffer low sensor
+Buffer,3,0-4,04,Modbus buffer temp. High,RW,INT16,[0.1°C],Actual temperature of buffer set via modbus (min = 0°C; max = 90°C)
+Buffer,3,0-4,05,Request type,RW,INT16,[Enum],-1 = INVALID REQEST (can be used to deactivate modbus request immediately), 0 = NO REQUEST, 1 = FLOW PUMP CIRCULATION, (is equal to NO_REQUEST for buffer module) 2 = CENTRAL HEATING, 3 = CENTRAL COOLING,
+Buffer,3,0-4,06,Request flow line temp. setpoint,RW,INT16,[0.1°C],Requested flow line temperature. (min = 0.0°C, max = 65.0°C) -> Valid value is reuqired!
+Buffer,3,0-4,07,Request return line temp. Setpoint,RW,INT16,[0.1°C],Requested return line temperature. (min = 0.0°C, max = 60.0°C) -> Valid value is reuqired!
+Buffer,3,0-4,08,Request heat sink temp. Diff setpoint,RW,INT16,[0.1°K],Requested temperature difference between flow line and return line. (min = 0.0K, max = 35.0K) -> Valid value is reuqired!
+Buffer,3,0-4,09,Modbus request heating capacity,RW,INT16,[0.1kW],Requested capacity (min = 0.0kW, max = 25,5kW) -> Value is optional.
+Buffer,3,0-4,50,Set.: Maximum buffer temp.,RW,INT16,[0.1°C],Setting for maximum buffer temperature (min = 25.0°C; max = 65.0°C)
+Solar,4,0-1,00,Error number,RO,INT16,[Nr],0 = No Error
+Solar,4,0-1,01,Operating state,RO,UINT16,[Nr],0 = STBY, 1 = HEATING, 2 = ERROR, 3 = OFF
+Solar,4,0-1,02,Collector temp.,RO,INT16,[0.1°C],Actual temperature collector sensor
+Solar,4,0-1,03,Buffer 1 temp.,RO,INT16,[0.1°C],Actual temperature buffer 1 sensor
+Solar,4,0-1,04,Buffer 2 temp.,RO,INT16,[0.1°C],Actual temperature buffer 1 sensor
+Solar,4,0-1,50,Set.: Maximum buffer temp.,RW,INT16,[0.1°C],Setting for maximum buffer temperature (min = 25.0°C; max = 90.0°C)
+Solar,4,0-1,51,Set.: Buffer changeover temp.,RW,INT16,[0.1°C],Setting for buffer changeover temperature (min = 25.0°C; max = 90.0°C)
+Heating circuit,5,0-11,00,Error number,RO,INT16,[Nr],0 = No Error
+Heating circuit,5,0-11,01,Operating state,RO,UINT16,[Nr],0 = HEATING, 1 = ECO, 2 = COOLING, 3 = FLOORDRY, 4 = FROST, 5 = MAX-TEMP, 6 = ERROR, 7 = SERVICE, 8 = HOLIDAY, 9 = CH-SUMMER, 10 = CC-WINTER, 11 = PRIO-STOP, 12 = OFF, 13 = RELEASE-OFF, 14 = TIME-OFF, 15 = STBY, 16 = STBY-HEATING, 17 = STBY-ECO, 18 = STBY-COOLING, 19 = STBY-FROST, 20 = STBY-FLOORDRY,
+Heating circuit,5,0-11,02,Flow line temp.,RO,INT16,[0.1°C],Actual temperature flow line sensor
+Heating circuit,5,0-11,03,Return line temp.,RO,INT16,[0.1°C],Actual temperature return line sensor
+Heating circuit,5,0-11,04,Room device temp.,RW,INT16,[0.1°C],Actual temperature room device sensor (min = -29.9°C; max = 99.9°C)
+Heating circuit,5,0-11,05,Setpoint flow line temp.,RW,INT16,[0.1°C],Setpoint temperature flow line (min = 15.0°C; max = 65.0°C)
+Heating circuit,5,0-11,06,Operating mode,RW,INT16,[Nr],0 = OFF(RW), 1 = MANUAL(R), 2 = AUTOMATIK(RW), 3 = AUTO-HEATING(RW), 4 = AUTO-COOLING(RW), 5 = FROST(RW), 6 = SUMMER(RW), 7 = FLOOR-DRY(R)
+Heating circuit,5,0-11,07,Target temp. flow line,RO,INT16,[0.1°C],Target temperature flow line
+Heating circuit,5,0-11,50,Set.: Offset flow line temp. setpoint,RW,INT16,[0.1°C],Setting for flow line temperature setpoint offset (min = -10.0K; max = 10.0K)
+Heating circuit,5,0-11,51,Set.: Setpoint room heating temp..,RW,INT16,[0.1°C],Setting for heating mode room setpoint temperature (min = 15.0°C; max = 40.0 °C)
+Heating circuit,5,0-11,52,Set.: Setpoint room cooling temp.,RW,INT16,[0.1°C],Setting for cooling mode room setpoint temperature (min = 15.0°C; max = 40.0 °C)
