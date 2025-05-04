@@ -20,21 +20,24 @@ SCAN_INTERVAL = timedelta(seconds=30)
 # Diese Konstante teilt Home Assistant mit, dass die Integration Übersetzungen hat
 TRANSLATION_SOURCES = {DOMAIN: "translations"}
 
+
 def setup_debug_logging(hass: HomeAssistant, config: ConfigType) -> None:
     """Set up debug logging for the integration."""
     if config.get("debug", False):
         logging.getLogger(DEBUG_PREFIX).setLevel(logging.DEBUG)
         _LOGGER.info("Debug logging enabled for %s", DEBUG_PREFIX)
 
+
 async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
     """Set up the Lambda integration."""
     setup_debug_logging(hass, config)
     return True
 
+
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up Lambda from a config entry."""
     _LOGGER.debug("Setting up Lambda integration with config: %s", entry.data)
-    
+
     try:
         coordinator = LambdaDataUpdateCoordinator(hass, entry)
         _LOGGER.debug("LambdaDataUpdateCoordinator initialized")
@@ -45,9 +48,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         return False
 
     hass.data.setdefault(DOMAIN, {})
-    hass.data[DOMAIN][entry.entry_id] = {
-        "coordinator": coordinator
-    }
+    hass.data[DOMAIN][entry.entry_id] = {"coordinator": coordinator}
 
     # Set up all platforms
     await hass.config_entries.async_forward_entry_setups(entry, ["sensor", "climate"])
@@ -61,11 +62,14 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
     return True
 
+
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Unload a config entry."""
     _LOGGER.debug("Unloading Lambda integration")
     try:
-        unload_ok = await hass.config_entries.async_unload_platforms(entry, ["sensor", "climate"])
+        unload_ok = await hass.config_entries.async_unload_platforms(
+            entry, ["sensor", "climate"]
+        )
     except ValueError as ex:
         _LOGGER.debug("Platform was not loaded or already unloaded: %s", ex)
         unload_ok = True
@@ -75,13 +79,16 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         if coordinator and getattr(coordinator, "client", None):
             await hass.async_add_executor_job(coordinator.client.close)
         hass.data[DOMAIN].pop(entry.entry_id)
-        
+
         # Wenn dies der letzte Entry war, entferne auch die Services
         if not hass.data[DOMAIN]:
             await async_unload_services(hass)
     else:
-        _LOGGER.debug("Entry %s not in hass.data[%s], nothing to remove.", entry.entry_id, DOMAIN)
+        _LOGGER.debug(
+            "Entry %s not in hass.data[%s], nothing to remove.", entry.entry_id, DOMAIN
+        )
     return unload_ok
+
 
 async def async_reload_entry(hass: HomeAssistant, entry: ConfigEntry) -> None:
     """Reload config entry."""
@@ -91,6 +98,7 @@ async def async_reload_entry(hass: HomeAssistant, entry: ConfigEntry) -> None:
         _LOGGER.error("Could not unload entry for reload, aborting reload!")
         return
     await async_setup_entry(hass, entry)
+
 
 # class LambdaDataUpdateCoordinator(DataUpdateCoordinator):
 #     """Class to manage fetching Lambda data."""
@@ -119,8 +127,8 @@ async def async_reload_entry(hass: HomeAssistant, entry: ConfigEntry) -> None:
 #                 port=self.config_entry.data["port"]
 #             )
 #             if not await self.hass.async_add_executor_job(self.client.connect):
-#                 _LOGGER.error("Could not connect to Modbus TCP at %s:%s", 
-#                             self.config_entry.data["host"], 
+#                 _LOGGER.error("Could not connect to Modbus TCP at %s:%s",
+#                             self.config_entry.data["host"],
 #                             self.config_entry.data["port"])
 #                 self.client = None
 #                 raise UpdateFailed("Could not connect to Modbus TCP")

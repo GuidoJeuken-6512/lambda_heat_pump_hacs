@@ -15,11 +15,11 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from .const import (
-    DOMAIN, 
-    DEFAULT_NAME, 
-    SENSOR_TYPES, 
-    FIRMWARE_VERSION, 
-    BOIL_SENSOR_TEMPLATES, 
+    DOMAIN,
+    DEFAULT_NAME,
+    SENSOR_TYPES,
+    FIRMWARE_VERSION,
+    BOIL_SENSOR_TEMPLATES,
     HC_SENSOR_TEMPLATES,
     BOIL_OPERATING_STATE,
     HC_OPERATING_STATE,
@@ -33,6 +33,7 @@ from .const import (
 
 _LOGGER = logging.getLogger(__name__)
 
+
 async def async_setup_entry(
     hass: HomeAssistant,
     entry: ConfigEntry,
@@ -40,21 +41,23 @@ async def async_setup_entry(
 ) -> None:
     """Set up Lambda climate entities."""
     coordinator = hass.data[DOMAIN][entry.entry_id]["coordinator"]
-    
+
     # Hole die Konfigurationsoptionen
     options = entry.options
-    
+
     # Hole die konfigurierte Firmware-Version
-    configured_fw = entry.options.get("firmware_version", entry.data.get("firmware_version", DEFAULT_FIRMWARE))
+    configured_fw = entry.options.get(
+        "firmware_version", entry.data.get("firmware_version", DEFAULT_FIRMWARE)
+    )
     fw_version = int(FIRMWARE_VERSION.get(configured_fw, "1"))
-    
+
     _LOGGER.debug(
         "Climate Firmware-Version Setup - Configured: %s, Numeric Version: %s, Raw Entry Data: %s",
         configured_fw,
         fw_version,
-        entry.data
+        entry.data,
     )
-    
+
     # Funktion zur Überprüfung der Sensor-Firmware-Kompatibilität
     def is_sensor_compatible(sensor_id: str) -> bool:
         # Prüfe dynamische Boiler-Sensoren
@@ -69,7 +72,7 @@ async def async_setup_entry(
                     sensor_id,
                     sensor_fw,
                     fw_version,
-                    is_compatible
+                    is_compatible,
                 )
                 return is_compatible
             _LOGGER.warning("Boiler sensor template for '%s' not found.", sensor_id)
@@ -86,7 +89,7 @@ async def async_setup_entry(
                     sensor_id,
                     sensor_fw,
                     fw_version,
-                    is_compatible
+                    is_compatible,
                 )
                 return is_compatible
             _LOGGER.warning("HC sensor template for '%s' not found.", sensor_id)
@@ -103,10 +106,10 @@ async def async_setup_entry(
             sensor_id,
             sensor_fw,
             fw_version,
-            is_compatible
+            is_compatible,
         )
         return is_compatible
-        
+
     entities = []
 
     # Dynamische Hot Water Entities für alle Boiler
@@ -114,7 +117,9 @@ async def async_setup_entry(
     for boil_idx in range(1, num_boil + 1):
         hw_current_temp_sensor = f"boil{boil_idx}_actual_high_temperature"
         hw_target_temp_sensor = f"boil{boil_idx}_target_high_temperature"
-        if is_sensor_compatible(hw_current_temp_sensor) and is_sensor_compatible(hw_target_temp_sensor):
+        if is_sensor_compatible(hw_current_temp_sensor) and is_sensor_compatible(
+            hw_target_temp_sensor
+        ):
             entities.append(
                 LambdaClimateEntity(
                     coordinator=coordinator,
@@ -123,9 +128,13 @@ async def async_setup_entry(
                     translation_key="hot_water",
                     current_temp_sensor=hw_current_temp_sensor,
                     target_temp_sensor=hw_target_temp_sensor,
-                    min_temp=options.get("hot_water_min_temp", DEFAULT_HOT_WATER_MIN_TEMP),
-                    max_temp=options.get("hot_water_max_temp", DEFAULT_HOT_WATER_MAX_TEMP),
-                    temp_step=1
+                    min_temp=options.get(
+                        "hot_water_min_temp", DEFAULT_HOT_WATER_MIN_TEMP
+                    ),
+                    max_temp=options.get(
+                        "hot_water_max_temp", DEFAULT_HOT_WATER_MAX_TEMP
+                    ),
+                    temp_step=1,
                 )
             )
 
@@ -134,7 +143,9 @@ async def async_setup_entry(
     for hc_idx in range(1, num_hc + 1):
         hc_current_temp_sensor = f"hc{hc_idx}_room_device_temperature"
         hc_target_temp_sensor = f"hc{hc_idx}_target_room_temperature"
-        if is_sensor_compatible(hc_current_temp_sensor) and is_sensor_compatible(hc_target_temp_sensor):
+        if is_sensor_compatible(hc_current_temp_sensor) and is_sensor_compatible(
+            hc_target_temp_sensor
+        ):
             entities.append(
                 LambdaClimateEntity(
                     coordinator=coordinator,
@@ -143,13 +154,20 @@ async def async_setup_entry(
                     translation_key="heating_circuit",
                     current_temp_sensor=hc_current_temp_sensor,
                     target_temp_sensor=hc_target_temp_sensor,
-                    min_temp=options.get("heating_circuit_min_temp", DEFAULT_HEATING_CIRCUIT_MIN_TEMP),
-                    max_temp=options.get("heating_circuit_max_temp", DEFAULT_HEATING_CIRCUIT_MAX_TEMP),
-                    temp_step=options.get("heating_circuit_temp_step", DEFAULT_HEATING_CIRCUIT_TEMP_STEP)
+                    min_temp=options.get(
+                        "heating_circuit_min_temp", DEFAULT_HEATING_CIRCUIT_MIN_TEMP
+                    ),
+                    max_temp=options.get(
+                        "heating_circuit_max_temp", DEFAULT_HEATING_CIRCUIT_MAX_TEMP
+                    ),
+                    temp_step=options.get(
+                        "heating_circuit_temp_step", DEFAULT_HEATING_CIRCUIT_TEMP_STEP
+                    ),
                 )
             )
-    
+
     async_add_entities(entities)
+
 
 class LambdaClimateEntity(CoordinatorEntity, ClimateEntity):
     """Representation of a Lambda climate entity."""
@@ -159,7 +177,7 @@ class LambdaClimateEntity(CoordinatorEntity, ClimateEntity):
     _attr_temperature_unit = "°C"
     _attr_supported_features = ClimateEntityFeature.TARGET_TEMPERATURE
     _attr_hvac_modes = [HVACMode.HEAT]  # Nur HEAT-Modus
-    _attr_hvac_mode = HVACMode.HEAT     # Immer im HEAT-Modus
+    _attr_hvac_mode = HVACMode.HEAT  # Immer im HEAT-Modus
     _attr_firmware_version = 1
 
     def __init__(
@@ -172,7 +190,7 @@ class LambdaClimateEntity(CoordinatorEntity, ClimateEntity):
         target_temp_sensor: str,
         min_temp: float,
         max_temp: float,
-        temp_step: float
+        temp_step: float,
     ) -> None:
         """Initialize the climate entity."""
         super().__init__(coordinator)
@@ -226,7 +244,7 @@ class LambdaClimateEntity(CoordinatorEntity, ClimateEntity):
             return None
 
         attributes = {}
-        
+
         # Get the raw operating state value
         operating_state = self.coordinator.data.get(self._operating_state_sensor)
         if operating_state is not None:
@@ -235,19 +253,31 @@ class LambdaClimateEntity(CoordinatorEntity, ClimateEntity):
                 state_value = int(operating_state)
                 # Map the state value to text based on the climate type
                 if self._climate_type.startswith("hot_water"):
-                    state_text = BOIL_OPERATING_STATE.get(state_value, f"Unknown state ({state_value})")
+                    state_text = BOIL_OPERATING_STATE.get(
+                        state_value, f"Unknown state ({state_value})"
+                    )
                     attributes["operating_state"] = state_text
                 elif self._climate_type.startswith("heating_circuit"):
-                    state_text = HC_OPERATING_STATE.get(state_value, f"Unknown state ({state_value})")
+                    state_text = HC_OPERATING_STATE.get(
+                        state_value, f"Unknown state ({state_value})"
+                    )
                     attributes["operating_state"] = state_text
             except (ValueError, TypeError):
-                attributes["operating_state"] = f"Invalid state value: {operating_state}"
+                attributes[
+                    "operating_state"
+                ] = f"Invalid state value: {operating_state}"
 
         return attributes
 
     @property
     def device_info(self):
-        from .const import SENSOR_TYPES, HP_SENSOR_TEMPLATES, BOIL_SENSOR_TEMPLATES, HC_SENSOR_TEMPLATES
+        from .const import (
+            SENSOR_TYPES,
+            HP_SENSOR_TEMPLATES,
+            BOIL_SENSOR_TEMPLATES,
+            HC_SENSOR_TEMPLATES,
+        )
+
         # Hauptgerät für Boiler/HC: climate_type hot_water_X oder heating_circuit_X
         if self._climate_type.startswith("hot_water"):
             idx = self._climate_type.split("_")[-1]
@@ -257,7 +287,7 @@ class LambdaClimateEntity(CoordinatorEntity, ClimateEntity):
                 "manufacturer": "Lambda",
                 "model": self._entry.data.get("firmware_version", "unknown"),
                 "via_device": (DOMAIN, self._entry.entry_id),
-                "entry_type": "service"
+                "entry_type": "service",
             }
         if self._climate_type.startswith("heating_circuit"):
             idx = self._climate_type.split("_")[-1]
@@ -267,7 +297,7 @@ class LambdaClimateEntity(CoordinatorEntity, ClimateEntity):
                 "manufacturer": "Lambda",
                 "model": self._entry.data.get("firmware_version", "unknown"),
                 "via_device": (DOMAIN, self._entry.entry_id),
-                "entry_type": "service"
+                "entry_type": "service",
             }
         # Fallback: Hauptgerät
         return {
@@ -276,7 +306,7 @@ class LambdaClimateEntity(CoordinatorEntity, ClimateEntity):
             "manufacturer": "Lambda",
             "model": self._entry.data.get("firmware_version", "unknown"),
             "configuration_url": f"http://{self._entry.data.get('host')}",
-            "sw_version": self._entry.data.get("firmware_version", "unknown")
+            "sw_version": self._entry.data.get("firmware_version", "unknown"),
         }
 
     async def async_set_temperature(self, **kwargs: Any) -> None:
@@ -293,18 +323,26 @@ class LambdaClimateEntity(CoordinatorEntity, ClimateEntity):
                     sensor_info = BOIL_SENSOR_TEMPLATES[parts[1]].copy()
                     idx = int(self._target_temp_sensor[4])
                     from .const import BOIL_BASE_ADDRESS
-                    sensor_info["address"] = BOIL_BASE_ADDRESS[idx] + sensor_info["relative_address"]
+
+                    sensor_info["address"] = (
+                        BOIL_BASE_ADDRESS[idx] + sensor_info["relative_address"]
+                    )
             elif self._target_temp_sensor.startswith("hc"):
                 parts = self._target_temp_sensor.split("_", 1)
                 if len(parts) == 2 and parts[1] in HC_SENSOR_TEMPLATES:
                     sensor_info = HC_SENSOR_TEMPLATES[parts[1]].copy()
                     idx = int(self._target_temp_sensor[2])
                     from .const import HC_BASE_ADDRESS
-                    sensor_info["address"] = HC_BASE_ADDRESS[idx] + sensor_info["relative_address"]
+
+                    sensor_info["address"] = (
+                        HC_BASE_ADDRESS[idx] + sensor_info["relative_address"]
+                    )
             else:
                 sensor_info = SENSOR_TYPES.get(self._target_temp_sensor)
             if not sensor_info:
-                _LOGGER.error("No sensor definition found for %s", self._target_temp_sensor)
+                _LOGGER.error(
+                    "No sensor definition found for %s", self._target_temp_sensor
+                )
                 return
             # Berechne den Rohwert für das Register mit der korrekten Skalierung
             raw_value = int(temperature / sensor_info["scale"])
@@ -313,7 +351,7 @@ class LambdaClimateEntity(CoordinatorEntity, ClimateEntity):
                 self.coordinator.client.write_registers,
                 sensor_info["address"],
                 [raw_value],
-                self._entry.data.get("slave_id", 1)
+                self._entry.data.get("slave_id", 1),
             )
             if result.isError():
                 _LOGGER.error("Failed to write target temperature: %s", result)

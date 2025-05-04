@@ -48,17 +48,19 @@ from .const import (
 
 _LOGGER = logging.getLogger(__name__)
 
+
 async def validate_input(hass: HomeAssistant, data: dict[str, Any]) -> None:
     """Validate the user input allows us to connect."""
     # Validation will be added later
     pass
+
 
 class LambdaConfigFlow(ConfigFlow, domain=DOMAIN):
     """Handle a config flow for Lambda WP."""
 
     VERSION = 1
     CONNECTION_CLASS = CONN_CLASS_LOCAL_POLL
-    
+
     def __init__(self) -> None:
         """Initialize the config flow."""
         self._data: dict[str, Any] = {}
@@ -86,107 +88,157 @@ class LambdaConfigFlow(ConfigFlow, domain=DOMAIN):
                 data_schema=vol.Schema(
                     {
                         vol.Required(
-                            CONF_NAME, 
-                            default=user_input.get(CONF_NAME, existing_data.get(CONF_NAME, DEFAULT_NAME))
+                            CONF_NAME,
+                            default=user_input.get(
+                                CONF_NAME, existing_data.get(CONF_NAME, DEFAULT_NAME)
+                            ),
                         ): selector.TextSelector(),
                         vol.Required(
-                            CONF_HOST, 
-                            default=user_input.get(CONF_HOST, existing_data.get(CONF_HOST, DEFAULT_HOST))
+                            CONF_HOST,
+                            default=user_input.get(
+                                CONF_HOST, existing_data.get(CONF_HOST, DEFAULT_HOST)
+                            ),
                         ): selector.TextSelector(),
                         vol.Required(
-                            CONF_PORT, 
-                            default=int(user_input.get(CONF_PORT, existing_data.get(CONF_PORT, DEFAULT_PORT)))
+                            CONF_PORT,
+                            default=int(
+                                user_input.get(
+                                    CONF_PORT,
+                                    existing_data.get(CONF_PORT, DEFAULT_PORT),
+                                )
+                            ),
                         ): selector.NumberSelector(
                             selector.NumberSelectorConfig(
                                 min=1,
                                 max=65535,
                                 step=1,
-                                mode=selector.NumberSelectorMode.BOX
+                                mode=selector.NumberSelectorMode.BOX,
                             )
                         ),
                         vol.Required(
-                            CONF_SLAVE_ID, 
-                            default=int(user_input.get(CONF_SLAVE_ID, existing_data.get(CONF_SLAVE_ID, DEFAULT_SLAVE_ID)))
+                            CONF_SLAVE_ID,
+                            default=int(
+                                user_input.get(
+                                    CONF_SLAVE_ID,
+                                    existing_data.get(CONF_SLAVE_ID, DEFAULT_SLAVE_ID),
+                                )
+                            ),
                         ): selector.NumberSelector(
                             selector.NumberSelectorConfig(
                                 min=1,
                                 max=255,
                                 step=1,
-                                mode=selector.NumberSelectorMode.BOX
+                                mode=selector.NumberSelectorMode.BOX,
                             )
                         ),
                         vol.Required(
                             "num_hps",
-                            default=int(user_input.get("num_hps", existing_data.get("num_hps", DEFAULT_NUM_HPS))),
+                            default=int(
+                                user_input.get(
+                                    "num_hps",
+                                    existing_data.get("num_hps", DEFAULT_NUM_HPS),
+                                )
+                            ),
                         ): selector.NumberSelector(
                             selector.NumberSelectorConfig(
                                 min=1,
                                 max=5,
                                 step=1,
-                                mode=selector.NumberSelectorMode.BOX
+                                mode=selector.NumberSelectorMode.BOX,
                             )
                         ),
                         vol.Required(
                             "num_boil",
-                            default=int(user_input.get("num_boil", existing_data.get("num_boil", DEFAULT_NUM_BOIL))),
+                            default=int(
+                                user_input.get(
+                                    "num_boil",
+                                    existing_data.get("num_boil", DEFAULT_NUM_BOIL),
+                                )
+                            ),
                         ): selector.NumberSelector(
                             selector.NumberSelectorConfig(
                                 min=0,
                                 max=5,
                                 step=1,
-                                mode=selector.NumberSelectorMode.BOX
+                                mode=selector.NumberSelectorMode.BOX,
                             )
                         ),
                         vol.Required(
                             "num_hc",
-                            default=int(user_input.get("num_hc", existing_data.get("num_hc", DEFAULT_NUM_HC))),
+                            default=int(
+                                user_input.get(
+                                    "num_hc",
+                                    existing_data.get("num_hc", DEFAULT_NUM_HC),
+                                )
+                            ),
                         ): selector.NumberSelector(
                             selector.NumberSelectorConfig(
                                 min=0,
                                 max=5,
                                 step=1,
-                                mode=selector.NumberSelectorMode.BOX
+                                mode=selector.NumberSelectorMode.BOX,
                             )
                         ),
                         vol.Required(
                             "num_buffer",
-                            default=int(user_input.get("num_buffer", existing_data.get("num_buffer", DEFAULT_NUM_BUFFER))),
+                            default=int(
+                                user_input.get(
+                                    "num_buffer",
+                                    existing_data.get("num_buffer", DEFAULT_NUM_BUFFER),
+                                )
+                            ),
                         ): selector.NumberSelector(
                             selector.NumberSelectorConfig(
                                 min=0,
                                 max=5,
                                 step=1,
-                                mode=selector.NumberSelectorMode.BOX
+                                mode=selector.NumberSelectorMode.BOX,
                             )
                         ),
                         vol.Required(
                             "num_solar",
-                            default=int(user_input.get("num_solar", existing_data.get("num_solar", DEFAULT_NUM_SOLAR))),
+                            default=int(
+                                user_input.get(
+                                    "num_solar",
+                                    existing_data.get("num_solar", DEFAULT_NUM_SOLAR),
+                                )
+                            ),
                         ): selector.NumberSelector(
                             selector.NumberSelectorConfig(
                                 min=0,
                                 max=5,
                                 step=1,
-                                mode=selector.NumberSelectorMode.BOX
+                                mode=selector.NumberSelectorMode.BOX,
                             )
                         ),
                         vol.Optional(
                             "firmware_version",
-                            default=user_input.get("firmware_version", existing_data.get("firmware_version", DEFAULT_FIRMWARE)),
+                            default=user_input.get(
+                                "firmware_version",
+                                existing_data.get("firmware_version", DEFAULT_FIRMWARE),
+                            ),
                         ): selector.SelectSelector(
                             selector.SelectSelectorConfig(
                                 options=firmware_options,
-                                mode=selector.SelectSelectorMode.DROPDOWN
+                                mode=selector.SelectSelectorMode.DROPDOWN,
                             )
                         ),
                     }
                 ),
-                errors=errors
+                errors=errors,
             )
 
         try:
             # Convert numeric values to integers
-            for key in ['port', 'slave_id', 'num_hps', 'num_boil', 'num_hc', 'num_buffer', 'num_solar']:
+            for key in [
+                "port",
+                "slave_id",
+                "num_hps",
+                "num_boil",
+                "num_hc",
+                "num_buffer",
+                "num_solar",
+            ]:
                 if key in user_input:
                     user_input[key] = int(user_input[key])
 
@@ -199,19 +251,57 @@ class LambdaConfigFlow(ConfigFlow, domain=DOMAIN):
             else:
                 # Erstelle den Eintrag mit Standard-Optionen
                 default_options = {
-                    "room_thermostat_control": user_input.get("room_thermostat_control", existing_options.get("room_thermostat_control", DEFAULT_ROOM_THERMOSTAT_CONTROL)),
-                    "hot_water_min_temp": user_input.get("hot_water_min_temp", existing_options.get("hot_water_min_temp", DEFAULT_HOT_WATER_MIN_TEMP)),
-                    "hot_water_max_temp": user_input.get("hot_water_max_temp", existing_options.get("hot_water_max_temp", DEFAULT_HOT_WATER_MAX_TEMP)),
-                    "heating_circuit_min_temp": user_input.get("heating_circuit_min_temp", existing_options.get("heating_circuit_min_temp", DEFAULT_HEATING_CIRCUIT_MIN_TEMP)),
-                    "heating_circuit_max_temp": user_input.get("heating_circuit_max_temp", existing_options.get("heating_circuit_max_temp", DEFAULT_HEATING_CIRCUIT_MAX_TEMP)),
-                    "heating_circuit_temp_step": user_input.get("heating_circuit_temp_step", existing_options.get("heating_circuit_temp_step", DEFAULT_HEATING_CIRCUIT_TEMP_STEP)),
-                    "firmware_version": user_input.get("firmware_version", existing_options.get("firmware_version", DEFAULT_FIRMWARE)),
+                    "room_thermostat_control": user_input.get(
+                        "room_thermostat_control",
+                        existing_options.get(
+                            "room_thermostat_control", DEFAULT_ROOM_THERMOSTAT_CONTROL
+                        ),
+                    ),
+                    "hot_water_min_temp": user_input.get(
+                        "hot_water_min_temp",
+                        existing_options.get(
+                            "hot_water_min_temp", DEFAULT_HOT_WATER_MIN_TEMP
+                        ),
+                    ),
+                    "hot_water_max_temp": user_input.get(
+                        "hot_water_max_temp",
+                        existing_options.get(
+                            "hot_water_max_temp", DEFAULT_HOT_WATER_MAX_TEMP
+                        ),
+                    ),
+                    "heating_circuit_min_temp": user_input.get(
+                        "heating_circuit_min_temp",
+                        existing_options.get(
+                            "heating_circuit_min_temp", DEFAULT_HEATING_CIRCUIT_MIN_TEMP
+                        ),
+                    ),
+                    "heating_circuit_max_temp": user_input.get(
+                        "heating_circuit_max_temp",
+                        existing_options.get(
+                            "heating_circuit_max_temp", DEFAULT_HEATING_CIRCUIT_MAX_TEMP
+                        ),
+                    ),
+                    "heating_circuit_temp_step": user_input.get(
+                        "heating_circuit_temp_step",
+                        existing_options.get(
+                            "heating_circuit_temp_step",
+                            DEFAULT_HEATING_CIRCUIT_TEMP_STEP,
+                        ),
+                    ),
+                    "firmware_version": user_input.get(
+                        "firmware_version",
+                        existing_options.get("firmware_version", DEFAULT_FIRMWARE),
+                    ),
                 }
-                logging.getLogger(__name__).debug("ConfigFlow: Erstelle neuen Eintrag mit data=%s, options=%s", user_input, default_options)
+                logging.getLogger(__name__).debug(
+                    "ConfigFlow: Erstelle neuen Eintrag mit data=%s, options=%s",
+                    user_input,
+                    default_options,
+                )
                 return self.async_create_entry(
                     title=user_input[CONF_NAME],
                     data=user_input,
-                    options=default_options
+                    options=default_options,
                 )
         except CannotConnect:
             errors["base"] = "cannot_connect"
@@ -223,13 +313,34 @@ class LambdaConfigFlow(ConfigFlow, domain=DOMAIN):
             step_id="user",
             data_schema=vol.Schema(
                 {
-                    vol.Required(CONF_NAME, default=user_input.get(CONF_NAME, existing_data.get(CONF_NAME, DEFAULT_NAME))): str,
-                    vol.Required(CONF_HOST, default=user_input.get(CONF_HOST, existing_data.get(CONF_HOST, DEFAULT_HOST))): str,
-                    vol.Required(CONF_PORT, default=user_input.get(CONF_PORT, existing_data.get(CONF_PORT, DEFAULT_PORT))): int,
-                    vol.Required(CONF_SLAVE_ID, default=user_input.get(CONF_SLAVE_ID, existing_data.get(CONF_SLAVE_ID, DEFAULT_SLAVE_ID))): int,
+                    vol.Required(
+                        CONF_NAME,
+                        default=user_input.get(
+                            CONF_NAME, existing_data.get(CONF_NAME, DEFAULT_NAME)
+                        ),
+                    ): str,
+                    vol.Required(
+                        CONF_HOST,
+                        default=user_input.get(
+                            CONF_HOST, existing_data.get(CONF_HOST, DEFAULT_HOST)
+                        ),
+                    ): str,
+                    vol.Required(
+                        CONF_PORT,
+                        default=user_input.get(
+                            CONF_PORT, existing_data.get(CONF_PORT, DEFAULT_PORT)
+                        ),
+                    ): int,
+                    vol.Required(
+                        CONF_SLAVE_ID,
+                        default=user_input.get(
+                            CONF_SLAVE_ID,
+                            existing_data.get(CONF_SLAVE_ID, DEFAULT_SLAVE_ID),
+                        ),
+                    ): int,
                 }
             ),
-            errors=errors
+            errors=errors,
         )
 
     @staticmethod
@@ -239,6 +350,7 @@ class LambdaConfigFlow(ConfigFlow, domain=DOMAIN):
     ) -> OptionsFlow:
         """Create the options flow."""
         return LambdaOptionsFlow(config_entry)
+
 
 class LambdaOptionsFlow(OptionsFlow):
     """Handle options."""
@@ -264,7 +376,7 @@ class LambdaOptionsFlow(OptionsFlow):
     ) -> FlowResult:
         """Manage the options."""
         errors: dict[str, str] = {}
-        
+
         _LOGGER.debug("Options-Flow aufgerufen. Aktuelle Optionen: %s", self._options)
         if user_input is not None:
             _LOGGER.debug("Options-Flow user_input: %s", user_input)
@@ -275,23 +387,32 @@ class LambdaOptionsFlow(OptionsFlow):
                         user_input[key] = float(user_input[key])
 
                 # Validate the input
-                if user_input.get("hot_water_min_temp", DEFAULT_HOT_WATER_MIN_TEMP) >= user_input.get("hot_water_max_temp", DEFAULT_HOT_WATER_MAX_TEMP):
+                if user_input.get(
+                    "hot_water_min_temp", DEFAULT_HOT_WATER_MIN_TEMP
+                ) >= user_input.get("hot_water_max_temp", DEFAULT_HOT_WATER_MAX_TEMP):
                     errors["hot_water_min_temp"] = "min_temp_higher"
                     errors["hot_water_max_temp"] = "max_temp_lower"
                 else:
                     # Wenn room_thermostat_control aktiviert wurde, gehe zum Schritt für die Sensorauswahl
                     if user_input.get("room_thermostat_control", False):
                         self._options.update(user_input)
-                        _LOGGER.debug("Options-Flow: Wechsel zu room_sensor mit Optionen: %s", self._options)
+                        _LOGGER.debug(
+                            "Options-Flow: Wechsel zu room_sensor mit Optionen: %s",
+                            self._options,
+                        )
                         return await self.async_step_room_sensor()
-                    
+
                     # Update options with new values
                     updated_options = dict(self._options)
                     updated_options.update(user_input)
-                    _LOGGER.debug("Options-Flow: Speichere Optionen: %s", updated_options)
+                    _LOGGER.debug(
+                        "Options-Flow: Speichere Optionen: %s", updated_options
+                    )
                     return self.async_create_entry(title="", data=updated_options)
             except ValueError as ex:
-                _LOGGER.error("Fehler bei der Konvertierung der Temperaturwerte: %s", ex)
+                _LOGGER.error(
+                    "Fehler bei der Konvertierung der Temperaturwerte: %s", ex
+                )
                 errors["base"] = "invalid_temperature"
             except Exception as ex:  # pylint: disable=broad-except
                 _LOGGER.exception("Unexpected exception: %s", ex)
@@ -299,12 +420,32 @@ class LambdaOptionsFlow(OptionsFlow):
 
         # Stelle sicher, dass die Standardwerte korrekt formatiert sind
         options = {
-            "hot_water_min_temp": float(self._options.get("hot_water_min_temp", DEFAULT_HOT_WATER_MIN_TEMP)),
-            "hot_water_max_temp": float(self._options.get("hot_water_max_temp", DEFAULT_HOT_WATER_MAX_TEMP)),
-            "room_thermostat_control": bool(self._options.get("room_thermostat_control", DEFAULT_ROOM_THERMOSTAT_CONTROL)),
-            "heating_circuit_min_temp": float(self._options.get("heating_circuit_min_temp", DEFAULT_HEATING_CIRCUIT_MIN_TEMP)),
-            "heating_circuit_max_temp": float(self._options.get("heating_circuit_max_temp", DEFAULT_HEATING_CIRCUIT_MAX_TEMP)),
-            "heating_circuit_temp_step": float(self._options.get("heating_circuit_temp_step", DEFAULT_HEATING_CIRCUIT_TEMP_STEP)),
+            "hot_water_min_temp": float(
+                self._options.get("hot_water_min_temp", DEFAULT_HOT_WATER_MIN_TEMP)
+            ),
+            "hot_water_max_temp": float(
+                self._options.get("hot_water_max_temp", DEFAULT_HOT_WATER_MAX_TEMP)
+            ),
+            "room_thermostat_control": bool(
+                self._options.get(
+                    "room_thermostat_control", DEFAULT_ROOM_THERMOSTAT_CONTROL
+                )
+            ),
+            "heating_circuit_min_temp": float(
+                self._options.get(
+                    "heating_circuit_min_temp", DEFAULT_HEATING_CIRCUIT_MIN_TEMP
+                )
+            ),
+            "heating_circuit_max_temp": float(
+                self._options.get(
+                    "heating_circuit_max_temp", DEFAULT_HEATING_CIRCUIT_MAX_TEMP
+                )
+            ),
+            "heating_circuit_temp_step": float(
+                self._options.get(
+                    "heating_circuit_temp_step", DEFAULT_HEATING_CIRCUIT_TEMP_STEP
+                )
+            ),
             "firmware_version": self._options.get("firmware_version", DEFAULT_FIRMWARE),
         }
         _LOGGER.debug("Options-Flow: Baue Schema mit Optionen: %s", options)
@@ -322,7 +463,7 @@ class LambdaOptionsFlow(OptionsFlow):
                                 max=80,
                                 step=1,
                                 unit_of_measurement="°C",
-                                mode=selector.NumberSelectorMode.BOX
+                                mode=selector.NumberSelectorMode.BOX,
                             )
                         ),
                         vol.Optional(
@@ -334,7 +475,7 @@ class LambdaOptionsFlow(OptionsFlow):
                                 max=80,
                                 step=1,
                                 unit_of_measurement="°C",
-                                mode=selector.NumberSelectorMode.BOX
+                                mode=selector.NumberSelectorMode.BOX,
                             )
                         ),
                         vol.Optional(
@@ -346,7 +487,7 @@ class LambdaOptionsFlow(OptionsFlow):
                                 max=50,
                                 step=0.5,
                                 unit_of_measurement="°C",
-                                mode=selector.NumberSelectorMode.BOX
+                                mode=selector.NumberSelectorMode.BOX,
                             )
                         ),
                         vol.Optional(
@@ -358,7 +499,7 @@ class LambdaOptionsFlow(OptionsFlow):
                                 max=70,
                                 step=0.5,
                                 unit_of_measurement="°C",
-                                mode=selector.NumberSelectorMode.BOX
+                                mode=selector.NumberSelectorMode.BOX,
                             )
                         ),
                         vol.Optional(
@@ -370,7 +511,7 @@ class LambdaOptionsFlow(OptionsFlow):
                                 max=5,
                                 step=0.1,
                                 unit_of_measurement="°C",
-                                mode=selector.NumberSelectorMode.BOX
+                                mode=selector.NumberSelectorMode.BOX,
                             )
                         ),
                         vol.Optional(
@@ -383,7 +524,7 @@ class LambdaOptionsFlow(OptionsFlow):
                         ): selector.SelectSelector(
                             selector.SelectSelectorConfig(
                                 options=list(FIRMWARE_VERSION.keys()),
-                                mode=selector.SelectSelectorMode.DROPDOWN
+                                mode=selector.SelectSelectorMode.DROPDOWN,
                             )
                         ),
                         vol.Optional(
@@ -395,7 +536,10 @@ class LambdaOptionsFlow(OptionsFlow):
                 errors=errors,
             )
         except Exception as ex:
-            _LOGGER.exception("Options-Flow: Fehler beim Bauen des Schemas oder Anzeigen des Formulars: %s", ex)
+            _LOGGER.exception(
+                "Options-Flow: Fehler beim Bauen des Schemas oder Anzeigen des Formulars: %s",
+                ex,
+            )
             raise
 
     async def async_step_room_sensor(
@@ -403,6 +547,7 @@ class LambdaOptionsFlow(OptionsFlow):
     ) -> FlowResult:
         """Handle the room sensor selection step."""
         from homeassistant.helpers.entity_registry import async_get
+
         errors: dict[str, str] = {}
         num_hc = self._config_entry.data.get("num_hc", 1)
 
@@ -422,7 +567,11 @@ class LambdaOptionsFlow(OptionsFlow):
         # Hole alle Entities, die NICHT zur eigenen Integration gehören
         temp_entities = []
         registry = async_get(self.hass)
-        eigene_entity_ids = {e.entity_id for e in registry.entities.values() if e.config_entry_id == self._config_entry.entry_id}
+        eigene_entity_ids = {
+            e.entity_id
+            for e in registry.entities.values()
+            if e.config_entry_id == self._config_entry.entry_id
+        }
         for entity_id in self.hass.states.async_entity_ids():
             if entity_id in eigene_entity_ids:
                 continue
@@ -435,10 +584,7 @@ class LambdaOptionsFlow(OptionsFlow):
 
         if not temp_entities:
             errors["base"] = "no_temp_sensors"
-            return self.async_show_form(
-                step_id="room_sensor",
-                errors=errors
-            )
+            return self.async_show_form(step_id="room_sensor", errors=errors)
 
         # Sortiere nach Friendly Name
         temp_entities.sort(key=lambda x: x[1].lower())
@@ -446,25 +592,25 @@ class LambdaOptionsFlow(OptionsFlow):
         schema = {}
         for hc_idx in range(1, num_hc + 1):
             entity_key = CONF_ROOM_TEMPERATURE_ENTITY.format(hc_idx)
-            schema[vol.Optional(
-                entity_key,
-                default=self._options.get(entity_key, "")
-            )] = selector.SelectSelector(
+            schema[
+                vol.Optional(entity_key, default=self._options.get(entity_key, ""))
+            ] = selector.SelectSelector(
                 selector.SelectSelectorConfig(
-                    options=[{"value": eid, "label": fname} for eid, fname in temp_entities],
-                    mode=selector.SelectSelectorMode.DROPDOWN
+                    options=[
+                        {"value": eid, "label": fname} for eid, fname in temp_entities
+                    ],
+                    mode=selector.SelectSelectorMode.DROPDOWN,
                 )
             )
         return self.async_show_form(
-            step_id="room_sensor",
-            data_schema=vol.Schema(schema),
-            errors=errors
+            step_id="room_sensor", data_schema=vol.Schema(schema), errors=errors
         )
 
     async def _test_connection(self, user_input: dict[str, Any]) -> None:
         """Test the connection to the Lambda device."""
         # Connection test will be implemented later
         pass
+
 
 class CannotConnect(HomeAssistantError):
     """Error to indicate we cannot connect."""

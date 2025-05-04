@@ -28,12 +28,7 @@ CONF_ROOM_TEMPERATURE_ENTITY = "room_temperature_entity_{0}"  # Format string fo
 # Debug and Logging
 DEBUG = False
 DEBUG_PREFIX = "lambda_wp"
-LOG_LEVELS = {
-    "error": "ERROR",
-    "warning": "WARNING",
-    "info": "INFO",
-    "debug": "DEBUG"
-}
+LOG_LEVELS = {"error": "ERROR", "warning": "WARNING", "info": "INFO", "debug": "DEBUG"}
 
 # Firmware Versions
 FIRMWARE_VERSION = {
@@ -68,30 +63,13 @@ HC_BASE_ADDRESS = {1: 5000, 2: 5100, 3: 5200, 4: 5300, 5: 5400}
 #######################
 
 # Ambient States
-AMBIENT_OPERATING_STATE = {
-    0: "Off",
-    1: "Automatik",
-    2: "Manual",
-    3: "Error"
-}
+AMBIENT_OPERATING_STATE = {0: "Off", 1: "Automatik", 2: "Manual", 3: "Error"}
 
 # E-Manager States
-EMGR_OPERATING_STATE = {
-    0: "Off",
-    1: "Automatik",
-    2: "Manual",
-    3: "Error",
-    4: "Offline"
-}
+EMGR_OPERATING_STATE = {0: "Off", 1: "Automatik", 2: "Manual", 3: "Error", 4: "Offline"}
 
 # Heat Pump States
-HP_ERROR_STATE = {
-    0: "OK",
-    1: "Message",
-    2: "Warning",
-    3: "Alarm",
-    4: "Fault"
-}
+HP_ERROR_STATE = {0: "OK", 1: "Message", 2: "Warning", 3: "Alarm", 4: "Fault"}
 
 HP_STATE = {
     0: "Init",
@@ -107,7 +85,7 @@ HP_STATE = {
     10: "Defrosting",
     31: "Fault-Lock",
     32: "Alarm-Block",
-    41: "Error-Reset"
+    41: "Error-Reset",
 }
 
 HP_OPERATING_STATE = {
@@ -129,7 +107,7 @@ HP_OPERATING_STATE = {
     15: "Time-Block",
     16: "Release-Block",
     17: "Mintemp-Block",
-    18: "Firmware-Download"
+    18: "Firmware-Download",
 }
 
 HP_REQUEST_TYPE = {
@@ -137,7 +115,7 @@ HP_REQUEST_TYPE = {
     1: "Flow Pump Circulation",
     2: "Central Heating",
     3: "Central Cooling",
-    4: "Domestic Hot Water"
+    4: "Domestic Hot Water",
 }
 
 # Boiler States
@@ -154,7 +132,7 @@ BOIL_OPERATING_STATE = {
     9: "Prompt-DHW",
     10: "Trailing-Stop",
     11: "Temp-Lock",
-    12: "Standby-Frost"
+    12: "Standby-Frost",
 }
 
 # Buffer States
@@ -168,7 +146,7 @@ BUFFER_OPERATION_STATE = {
     6: "PRIO-STOP",
     7: "ERROR",
     8: "OFF",
-    9: "STBY-FROST"
+    9: "STBY-FROST",
 }
 
 # Solar States
@@ -178,7 +156,7 @@ SOLAR_OPERATING_STATE = {
     2: "Standby",
     3: "Error",
     4: "Frost Protection",
-    5: "Overheating Protection"
+    5: "Overheating Protection",
 }
 
 # Heating Circuit States
@@ -203,7 +181,7 @@ HC_OPERATING_STATE = {
     17: "Standby-Eco",
     18: "Standby-Cooling",
     19: "Standby-Frost",
-    20: "Standby-Floor-dry"
+    20: "Standby-Floor-dry",
 }
 
 HC_OPERATING_MODE = {
@@ -214,7 +192,7 @@ HC_OPERATING_MODE = {
     4: "Auto-Cooling",
     5: "Frost",
     6: "Summer",
-    7: "Floor-dry"
+    7: "Floor-dry",
 }
 
 #######################
@@ -694,7 +672,7 @@ SOLAR_SENSOR_TEMPLATES = {
         "data_type": "int32",
         "firmware_version": 1,
         "device_type": "solar",
-    }
+    },
 }
 
 # Heating Circuit Sensors
@@ -824,7 +802,7 @@ SENSOR_TYPES = {
         "firmware_version": 2,
         "device_type": "main",
         "initial_value": 5,
-    },    
+    },
     "ambient_error_number": {
         "address": 0,
         "name": "Ambient Error Number",
@@ -929,29 +907,22 @@ SENSOR_TYPES = {
 
 # Room Temperature Settings
 ROOM_TEMPERATURE_REGISTER_OFFSET = 4  # Register offset for room temperature within a HC
-ROOM_TEMPERATURE_UPDATE_INTERVAL = 1  # Update interval for room temperature (in minutes)
+ROOM_TEMPERATURE_UPDATE_INTERVAL = (
+    1  # Update interval for room temperature (in minutes)
+)
 
 DEFAULT_HEATING_CIRCUIT_MIN_TEMP = 15
 DEFAULT_HEATING_CIRCUIT_MAX_TEMP = 35
 DEFAULT_HEATING_CIRCUIT_TEMP_STEP = 0.5
 
-CIRCULATION_PUMP_STATE = {
-    0: "OFF",
-    1: "ON"
-}
+CIRCULATION_PUMP_STATE = {0: "OFF", 1: "ON"}
 
-SOLAR_OPERATION_STATE = {
-    0: "STBY",
-    1: "HEATING",
-    2: "ERROR",
-    3: "OFF"
-}
+SOLAR_OPERATION_STATE = {0: "STBY", 1: "HEATING", 2: "ERROR", 3: "OFF"}
 
 BUFFER_REQUEST_TYPE = {
     -1: "INVALID REQUEST",
     0: "NO REQUEST",
     1: "FLOW PUMP CIRCULATION",
     2: "CENTRAL HEATING",
-    3: "CENTRAL COOLING"
+    3: "CENTRAL COOLING",
 }
-
