@@ -1,3 +1,9 @@
+import sys
+from os.path import dirname, abspath
+
+# Add the custom_components directory to the Python path
+sys.path.insert(0, abspath(dirname(__file__) + '/../custom_components'))
+
 import asyncio
 from unittest.mock import patch, MagicMock
 from homeassistant.core import HomeAssistant
