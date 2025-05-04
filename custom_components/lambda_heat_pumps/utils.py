@@ -1,5 +1,11 @@
 def get_compatible_sensors(sensor_templates: dict, fw_version: int) -> dict:
-    """Filtert und gibt nur die Sensoren zurück, die mit der angegebenen Firmware-Version kompatibel sind."""
+    """Return only sensors compatible with the given firmware version.
+     Args:
+        sensor_templates: Dictionary of sensor templates
+        fw_version: The firmware version to check against
+     Returns:
+        Filtered dictionary of compatible sensors
+    """
     return {
         k: v
         for k, v in sensor_templates.items()
