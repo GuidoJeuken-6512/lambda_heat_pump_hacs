@@ -12,7 +12,6 @@ from homeassistant.const import (
     ATTR_ENTITY_ID,
 )
 from homeassistant.helpers.event import async_track_time_interval
-from homeassistant.components.sensor import SensorStateClass
 
 from .const import (
     DOMAIN,

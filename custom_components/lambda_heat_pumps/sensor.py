@@ -10,14 +10,12 @@ from homeassistant.components.sensor import (
     SensorStateClass,
 )
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import CONF_NAME
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from .const import (
     DOMAIN,
-    DEFAULT_NAME,
     SENSOR_TYPES,
     FIRMWARE_VERSION,
     HP_SENSOR_TEMPLATES,
@@ -30,9 +28,6 @@ from .const import (
     BUFFER_BASE_ADDRESS,
     SOLAR_SENSOR_TEMPLATES,
     SOLAR_BASE_ADDRESS,
-    SOLAR_OPERATION_STATE,
-    BUFFER_OPERATION_STATE,
-    BUFFER_REQUEST_TYPE,
 )
 from .utils import get_compatible_sensors
 
@@ -351,9 +346,6 @@ class LambdaSensor(CoordinatorEntity, SensorEntity):
                 HC_OPERATING_STATE,
                 HC_OPERATING_MODE,
                 CIRCULATION_PUMP_STATE,
-                SOLAR_OPERATION_STATE,
-                BUFFER_OPERATION_STATE,
-                BUFFER_REQUEST_TYPE,
             )
 
             # Ensure value is an integer for state mapping

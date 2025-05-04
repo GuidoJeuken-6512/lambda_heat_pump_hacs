@@ -2,15 +2,12 @@
 from __future__ import annotations
 from datetime import timedelta
 import logging
-from typing import Any
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 from homeassistant.helpers.typing import ConfigType
-from homeassistant.const import EVENT_HOMEASSISTANT_STOP
 
-from .const import DOMAIN, DEBUG, DEBUG_PREFIX, LOG_LEVELS, SENSOR_TYPES
+from .const import DOMAIN, DEBUG_PREFIX
 from .coordinator import LambdaDataUpdateCoordinator
 from .services import async_setup_services, async_unload_services
 
@@ -97,57 +94,4 @@ async def async_reload_entry(hass: HomeAssistant, entry: ConfigEntry) -> None:
     if not unload_ok:
         _LOGGER.error("Could not unload entry for reload, aborting reload!")
         return
-    await async_setup_entry(hass, entry)
-
-
-# class LambdaDataUpdateCoordinator(DataUpdateCoordinator):
-#     """Class to manage fetching Lambda data."""
-#
-#     def __init__(self, hass: HomeAssistant, entry: ConfigEntry):
-#         """Initialize."""
-#         super().__init__(
-#             hass,
-#             _LOGGER,
-#             name=DOMAIN,
-#             update_interval=SCAN_INTERVAL,
-#             config_entry=entry,
-#         )
-#         self.client = None
-#         _LOGGER.debug("Initialized LambdaDataUpdateCoordinator")
-#
-#     async def _async_update_data(self) -> dict[str, Any]:
-#         """Fetch data from Lambda device."""
-#         from pymodbus.client import ModbusTcpClient
-#         from pymodbus.exceptions import ModbusException
-#
-#         if self.client is None:
-#             _LOGGER.debug("Creating new Modbus TCP client")
-#             self.client = ModbusTcpClient(
-#                 self.config_entry.data["host"],
-#                 port=self.config_entry.data["port"]
-#             )
-#             if not await self.hass.async_add_executor_job(self.client.connect):
-#                 _LOGGER.error("Could not connect to Modbus TCP at %s:%s",
-#                             self.config_entry.data["host"],
-#                             self.config_entry.data["port"])
-#                 self.client = None
-#                 raise UpdateFailed("Could not connect to Modbus TCP")
-#
-#         try:
-#             data = {}
-#             _LOGGER.debug("Reading Modbus registers")
-#             # ...existing code...
-#             return data
-#
-#         except ModbusException as ex:
-#             _LOGGER.error("Modbus communication error: %s", ex)
-#             if self.client:
-#                 await self.hass.async_add_executor_job(self.client.close)
-#             self.client = None
-#             raise UpdateFailed(f"Modbus communication error: {ex}")
-#         except Exception as ex:
-#             _LOGGER.error("Unexpected error: %s", ex)
-#             if self.client:
-#                 await self.hass.async_add_executor_job(self.client.close)
-#             self.client = None
-#             raise UpdateFailed(f"Unexpected error: {ex}")
+    await async_setup_entry(hass, entry)  # Completed the function call
