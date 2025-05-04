@@ -9,14 +9,13 @@ from homeassistant.components.climate import (
     HVACMode,
 )
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import ATTR_TEMPERATURE, CONF_NAME
+from homeassistant.const import ATTR_TEMPERATURE
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from .const import (
     DOMAIN,
-    DEFAULT_NAME,
     SENSOR_TYPES,
     FIRMWARE_VERSION,
     BOIL_SENSOR_TEMPLATES,
@@ -222,6 +221,7 @@ class LambdaClimateEntity(CoordinatorEntity, ClimateEntity):
         self._attr_min_temp = min_temp
         self._attr_max_temp = max_temp
         self._attr_target_temperature_step = temp_step
+        _LOGGER.debug("Climate entity initialized with min_temp: %s, max_temp: %s", min_temp, max_temp)
 
     @property
     def current_temperature(self) -> float | None:
