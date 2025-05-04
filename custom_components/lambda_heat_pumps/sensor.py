@@ -28,6 +28,9 @@ from .const import (
     BUFFER_BASE_ADDRESS,
     SOLAR_SENSOR_TEMPLATES,
     SOLAR_BASE_ADDRESS,
+    SOLAR_OPERATION_STATE,
+    BUFFER_OPERATION_STATE,  # Import the missing constants
+    BUFFER_REQUEST_TYPE,  # Import the missing constant
 )
 from .utils import get_compatible_sensors
 
@@ -284,6 +287,8 @@ class LambdaSensor(CoordinatorEntity, SensorEntity):
         self._attr_unique_id = sensor_id
         self.entity_id = f"sensor.{sensor_id}"
 
+        _LOGGER.debug("Sensor initialized with ID: %s and config: %s", sensor_id, sensor_config)
+
         # Verbesserte Erkennung von Zustandssensoren
         # Prüfe zuerst, ob es ein Temperatursensor ist
         if sensor_config.get("unit") == "°C":
@@ -341,7 +346,6 @@ class LambdaSensor(CoordinatorEntity, SensorEntity):
                 HP_ERROR_STATE,
                 HP_STATE,
                 HP_OPERATING_STATE,
-                HP_REQUEST_TYPE,
                 BOIL_OPERATING_STATE,
                 HC_OPERATING_STATE,
                 HC_OPERATING_MODE,

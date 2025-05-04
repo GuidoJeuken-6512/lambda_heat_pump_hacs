@@ -94,4 +94,4 @@ async def async_reload_entry(hass: HomeAssistant, entry: ConfigEntry) -> None:
     if not unload_ok:
         _LOGGER.error("Could not unload entry for reload, aborting reload!")
         return
-    await async_setup_entry(hass, entry)  # Completed the function call
+    await async_setup_entry(hass, entry)

@@ -1,16 +1,13 @@
 """Services for Lambda WP integration."""
 from __future__ import annotations
 import logging
-from typing import Any
 from datetime import timedelta
 
 import voluptuous as vol
 
 from homeassistant.core import HomeAssistant, ServiceCall, callback
 from homeassistant.helpers import config_validation as cv
-from homeassistant.const import (
-    ATTR_ENTITY_ID,
-)
+from homeassistant.const import ATTR_ENTITY_ID
 from homeassistant.helpers.event import async_track_time_interval
 
 from .const import (
@@ -37,7 +34,7 @@ UPDATE_ROOM_TEMPERATURE_SCHEMA = vol.Schema(
 
 async def async_setup_services(hass: HomeAssistant) -> None:
     """Set up Lambda WP services."""
-    _LOGGER.debug("async_setup_services called")
+    _LOGGER.debug("Service setup completed successfully")
     # Speichere die Unsubscribe-Funktionen pro Entry, um sie später entfernen zu können
     unsub_update_callbacks = {}
 

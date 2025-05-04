@@ -13,12 +13,9 @@ from homeassistant.config_entries import (
 )
 from homeassistant.const import CONF_HOST, CONF_PORT, CONF_NAME
 from homeassistant.data_entry_flow import FlowResult
-import homeassistant.helpers.config_validation as cv
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers import selector
-from homeassistant.components.sensor import SensorDeviceClass
-from homeassistant.helpers.entity_registry import async_get as async_get_entity_registry
 
 from .const import (
     DOMAIN,
@@ -38,9 +35,6 @@ from .const import (
     DEFAULT_HEATING_CIRCUIT_MIN_TEMP,
     DEFAULT_HEATING_CIRCUIT_MAX_TEMP,
     DEFAULT_HEATING_CIRCUIT_TEMP_STEP,
-    DEBUG,
-    LOG_LEVELS,
-    SENSOR_TYPES,
     CONF_SLAVE_ID,
     FIRMWARE_VERSION,
     CONF_ROOM_TEMPERATURE_ENTITY,
@@ -448,7 +442,7 @@ class LambdaOptionsFlow(OptionsFlow):
             ),
             "firmware_version": self._options.get("firmware_version", DEFAULT_FIRMWARE),
         }
-        _LOGGER.debug("Options-Flow: Baue Schema mit Optionen: %s", options)
+        _LOGGER.debug("Config flow initialized with options: %s", options)
         try:
             return self.async_show_form(
                 step_id="init",
