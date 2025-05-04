@@ -52,7 +52,9 @@ async def async_setup_entry(
     fw_version = int(FIRMWARE_VERSION.get(configured_fw, "1"))
 
     _LOGGER.debug(
-        "Firmware-Version Setup - Configured: %s, Numeric Version: %s, Raw Entry Data: %s, Available Versions: %s",
+        "Firmware-Version Setup - "
+        "Configured: %s, Numeric Version: %s, "
+        "Raw Entry Data: %s, Available Versions: %s",
         configured_fw,
         fw_version,
         entry.data,
@@ -69,7 +71,9 @@ async def async_setup_entry(
         sensor_fw = sensor_config.get("firmware_version", 1)
         is_compatible = sensor_fw <= fw_version
         _LOGGER.debug(
-            "Sensor Compatibility Check - Sensor: %s, Required FW: %s, Current FW: %s, Compatible: %s, Raw Sensor Config: %s",
+            "Sensor Compatibility Check - "
+            "Sensor: %s, Required FW: %s, Current FW: %s, "
+            "Compatible: %s, Raw Sensor Config: %s",
             sensor_id,
             sensor_fw,
             fw_version,
@@ -94,9 +98,15 @@ async def async_setup_entry(
         )
 
     # Dynamische Generierung der HP-Sensoren
-    compatible_hp_templates = get_compatible_sensors(HP_SENSOR_TEMPLATES, fw_version)
+    compatible_hp_templates = get_compatible_sensors(
+        HP_SENSOR_TEMPLATES,
+        fw_version,
+    )
     num_hps = entry.data.get("num_hps", 1)
-    _LOGGER.debug("Starting dynamic sensor generation for %d heat pumps", num_hps)
+    _LOGGER.debug(
+        "Starting dynamic sensor generation for %d heat pumps",
+        num_hps,
+    )
     for hp_idx in range(1, num_hps + 1):
         for template_key, template in compatible_hp_templates.items():
             # Korrekte sensor_id: <name>_hp<idx>_<template_key>
@@ -104,10 +114,14 @@ async def async_setup_entry(
             address = HP_BASE_ADDRESS[hp_idx] + template["relative_address"]
             sensor_config = template.copy()
             sensor_config["address"] = address
-            sensor_config[
-                "name"
-            ] = f"{name_prefix.upper()} HP{hp_idx} {template['name']}"
-            _LOGGER.debug("Creating sensor: %s at address: %d", sensor_id, address)
+            sensor_config["name"] = (
+                f"{name_prefix.upper()} HP{hp_idx} {template['name']}"
+            )
+            _LOGGER.debug(
+                "Creating sensor: %s at address: %d",
+                sensor_id,
+                address,
+            )
             entities.append(
                 LambdaSensor(
                     coordinator=coordinator,
@@ -123,10 +137,14 @@ async def async_setup_entry(
 
     # Dynamische Generierung der Boiler-Sensoren
     compatible_boil_templates = get_compatible_sensors(
-        BOIL_SENSOR_TEMPLATES, fw_version
+        BOIL_SENSOR_TEMPLATES,
+        fw_version,
     )
     num_boil = entry.data.get("num_boil", 1)
-    _LOGGER.debug("Starting dynamic sensor generation for %d boilers", num_boil)
+    _LOGGER.debug(
+        "Starting dynamic sensor generation for %d boilers",
+        num_boil,
+    )
     for boil_idx in range(1, num_boil + 1):
         for template_key, template in compatible_boil_templates.items():
             # Korrekte sensor_id: <name>_boil<idx>_<template_key>
@@ -135,12 +153,16 @@ async def async_setup_entry(
             sensor_config = template.copy()
             sensor_config["address"] = address
             orig_name = template["name"].replace("Boiler ", "")
-            sensor_config["name"] = f"{name_prefix.upper()} Boil{boil_idx} {orig_name}"
-            sensor_config[
-                "original_name"
-            ] = f"{name_prefix.upper()} Boil{boil_idx} {orig_name}"
+            sensor_config["name"] = (
+                f"{name_prefix.upper()} Boil{boil_idx} {orig_name}"
+            )
+            sensor_config["original_name"] = (
+                f"{name_prefix.upper()} Boil{boil_idx} {orig_name}"
+            )
             _LOGGER.debug(
-                "Creating boiler sensor: %s at address: %d", sensor_id, address
+                "Creating boiler sensor: %s at address: %d",
+                sensor_id,
+                address,
             )
             entities.append(
                 LambdaSensor(
@@ -156,19 +178,29 @@ async def async_setup_entry(
     )
 
     # Dynamische Generierung der HC-Sensoren
-    compatible_hc_templates = get_compatible_sensors(HC_SENSOR_TEMPLATES, fw_version)
+    compatible_hc_templates = get_compatible_sensors(
+        HC_SENSOR_TEMPLATES,
+        fw_version,
+    )
     num_hc = entry.data.get("num_hc", 1)
-    _LOGGER.debug("Starting dynamic sensor generation for %d heating circuits", num_hc)
+    _LOGGER.debug(
+        "Starting dynamic sensor generation for %d heating circuits",
+        num_hc,
+    )
     for hc_idx in range(1, num_hc + 1):
         for template_key, template in compatible_hc_templates.items():
             sensor_id = f"hc{hc_idx}_{template_key}"
             address = HC_BASE_ADDRESS[hc_idx] + template["relative_address"]
             sensor_config = template.copy()
             sensor_config["address"] = address
-            sensor_config[
-                "name"
-            ] = f"{name_prefix.upper()} HC{hc_idx} {template['name']}"
-            _LOGGER.debug("Creating sensor: %s at address: %d", sensor_id, address)
+            sensor_config["name"] = (
+                f"{name_prefix.upper()} HC{hc_idx} {template['name']}"
+            )
+            _LOGGER.debug(
+                "Creating sensor: %s at address: %d",
+                sensor_id,
+                address,
+            )
             entities.append(
                 LambdaSensor(
                     coordinator=coordinator,
@@ -187,25 +219,28 @@ async def async_setup_entry(
 
     # Dynamische Generierung der Buffer-Sensoren
     compatible_buffer_templates = get_compatible_sensors(
-        BUFFER_SENSOR_TEMPLATES, fw_version
+        BUFFER_SENSOR_TEMPLATES,
+        fw_version,
     )
     num_buffer = entry.data.get("num_buffer", 1)
     _LOGGER.debug(
-        "Starting dynamic sensor generation for %d buffer modules", num_buffer
+        "Starting dynamic sensor generation for %d buffer modules",
+        num_buffer,
     )
     for buffer_idx in range(1, num_buffer + 1):
         for template_key, template in compatible_buffer_templates.items():
             sensor_id = f"buffer{buffer_idx}_{template_key}"
-            address = (
-                BUFFER_BASE_ADDRESS.get(buffer_idx, 3000) + template["relative_address"]
-            )
+            base_addr = BUFFER_BASE_ADDRESS.get(buffer_idx, 3000)
+            address = base_addr + template["relative_address"]
             sensor_config = template.copy()
             sensor_config["address"] = address
-            sensor_config[
-                "name"
-            ] = f"{name_prefix.upper()} Buffer{buffer_idx} {template['name']}"
+            sensor_config["name"] = (
+                f"{name_prefix.upper()} Buffer{buffer_idx} {template['name']}"
+            )
             _LOGGER.debug(
-                "Creating buffer sensor: %s at address: %d", sensor_id, address
+                "Creating buffer sensor: %s at address: %d",
+                sensor_id,
+                address,
             )
             entities.append(
                 LambdaSensor(
@@ -226,23 +261,28 @@ async def async_setup_entry(
 
     # Dynamische Generierung der Solar-Sensoren
     compatible_solar_templates = get_compatible_sensors(
-        SOLAR_SENSOR_TEMPLATES, fw_version
+        SOLAR_SENSOR_TEMPLATES,
+        fw_version,
     )
     num_solar = entry.data.get("num_solar", 1)
-    _LOGGER.debug("Starting dynamic sensor generation for %d solar modules", num_solar)
+    _LOGGER.debug(
+        "Starting dynamic sensor generation for %d solar modules",
+        num_solar,
+    )
     for solar_idx in range(1, num_solar + 1):
         for template_key, template in compatible_solar_templates.items():
             sensor_id = f"solar{solar_idx}_{template_key}"
-            address = (
-                SOLAR_BASE_ADDRESS.get(solar_idx, 4000) + template["relative_address"]
-            )
+            base_addr = SOLAR_BASE_ADDRESS.get(solar_idx, 4000)
+            address = base_addr + template["relative_address"]
             sensor_config = template.copy()
             sensor_config["address"] = address
-            sensor_config[
-                "name"
-            ] = f"{name_prefix.upper()} Solar{solar_idx} {template['name']}"
+            sensor_config["name"] = (
+                f"{name_prefix.upper()} Solar{solar_idx} {template['name']}"
+            )
             _LOGGER.debug(
-                "Creating solar sensor: %s at address: %d", sensor_id, address
+                "Creating solar sensor: %s at address: %d",
+                sensor_id,
+                address,
             )
             entities.append(
                 LambdaSensor(
@@ -287,7 +327,11 @@ class LambdaSensor(CoordinatorEntity, SensorEntity):
         self._attr_unique_id = sensor_id
         self.entity_id = f"sensor.{sensor_id}"
 
-        _LOGGER.debug("Sensor initialized with ID: %s and config: %s", sensor_id, sensor_config)
+        _LOGGER.debug(
+            "Sensor initialized with ID: %s and config: %s",
+            sensor_id,
+            sensor_config,
+        )
 
         # Verbesserte Erkennung von Zustandssensoren
         # Prüfe zuerst, ob es ein Temperatursensor ist
@@ -366,16 +410,25 @@ class LambdaSensor(CoordinatorEntity, SensorEntity):
                 state_mapping = EMGR_OPERATING_STATE
             elif "actual_circulation_pump_state" in self._sensor_id:
                 state_mapping = CIRCULATION_PUMP_STATE
-            elif "operating_state" in self._sensor_id and "solar" in self._sensor_id:
+            elif (
+                "operating_state" in self._sensor_id
+                and "solar" in self._sensor_id
+            ):
                 state_mapping = SOLAR_OPERATION_STATE
-            elif "operating_state" in self._sensor_id and "buffer" in self._sensor_id:
+            elif (
+                "operating_state" in self._sensor_id
+                and "buffer" in self._sensor_id
+            ):
                 state_mapping = BUFFER_OPERATION_STATE
-            elif "request_type" in self._sensor_id and "buffer" in self._sensor_id:
+            elif (
+                "request_type" in self._sensor_id
+                and "buffer" in self._sensor_id
+            ):
                 state_mapping = BUFFER_REQUEST_TYPE
             elif "error_state" in self._sensor_id:
                 state_mapping = HP_ERROR_STATE
             elif "_state" in self._sensor_id:
-                if "hp" in self._sensor_id and not "operating" in self._sensor_id:
+                if "hp" in self._sensor_id and "operating" not in self._sensor_id:
                     state_mapping = HP_STATE
                 elif "hp" in self._sensor_id and "operating" in self._sensor_id:
                     state_mapping = HP_OPERATING_STATE
@@ -388,7 +441,8 @@ class LambdaSensor(CoordinatorEntity, SensorEntity):
 
             if state_mapping is not None:
                 return state_mapping.get(
-                    numeric_value, f"Unknown state ({numeric_value})"
+                    numeric_value,
+                    f"Unknown state ({numeric_value})",
                 )
             return f"Unknown mapping for state ({numeric_value})"
 
@@ -412,14 +466,18 @@ class LambdaSensor(CoordinatorEntity, SensorEntity):
     @property
     def device_info(self):
         device_type = self._config.get("device_type")
+        entry_id = self._entry.entry_id
+        fw_version = self._entry.data.get("firmware_version", "unknown")
+
         if device_type == "main":
+            host = self._entry.data.get("host")
             return {
-                "identifiers": {(DOMAIN, self._entry.entry_id)},
+                "identifiers": {(DOMAIN, entry_id)},
                 "name": self._entry.data.get("name", "Lambda WP"),
                 "manufacturer": "Lambda",
-                "model": self._entry.data.get("firmware_version", "unknown"),
-                "configuration_url": f"http://{self._entry.data.get('host')}",
-                "sw_version": self._entry.data.get("firmware_version", "unknown"),
+                "model": fw_version,
+                "configuration_url": f"http://{host}",
+                "sw_version": fw_version,
                 "entry_type": None,
                 "suggested_area": None,
                 "via_device": None,
@@ -428,52 +486,57 @@ class LambdaSensor(CoordinatorEntity, SensorEntity):
             }
         if device_type == "heat_pump":
             idx = self._sensor_id[2]
+            device_id = f"{entry_id}_hp{idx}"
             return {
-                "identifiers": {(DOMAIN, f"{self._entry.entry_id}_hp{idx}")},
+                "identifiers": {(DOMAIN, device_id)},
                 "name": f"Heat Pump {idx}",
                 "manufacturer": "Lambda",
-                "model": self._entry.data.get("firmware_version", "unknown"),
-                "via_device": (DOMAIN, self._entry.entry_id),
+                "model": fw_version,
+                "via_device": (DOMAIN, entry_id),
                 "entry_type": "service",
             }
         if device_type == "boiler":
             idx = self._sensor_id[4]
+            device_id = f"{entry_id}_boil{idx}"
             return {
-                "identifiers": {(DOMAIN, f"{self._entry.entry_id}_boil{idx}")},
+                "identifiers": {(DOMAIN, device_id)},
                 "name": f"Boiler {idx}",
                 "manufacturer": "Lambda",
-                "model": self._entry.data.get("firmware_version", "unknown"),
-                "via_device": (DOMAIN, self._entry.entry_id),
+                "model": fw_version,
+                "via_device": (DOMAIN, entry_id),
                 "entry_type": "service",
             }
         if device_type == "heating_circuit":
             idx = self._sensor_id[2]
+            device_id = f"{entry_id}_hc{idx}"
             return {
-                "identifiers": {(DOMAIN, f"{self._entry.entry_id}_hc{idx}")},
+                "identifiers": {(DOMAIN, device_id)},
                 "name": f"Heating Circuit {idx}",
                 "manufacturer": "Lambda",
-                "model": self._entry.data.get("firmware_version", "unknown"),
-                "via_device": (DOMAIN, self._entry.entry_id),
+                "model": fw_version,
+                "via_device": (DOMAIN, entry_id),
                 "entry_type": "service",
             }
         if device_type == "buffer":
             idx = self._sensor_id[6]
+            device_id = f"{entry_id}_buffer{idx}"
             return {
-                "identifiers": {(DOMAIN, f"{self._entry.entry_id}_buffer{idx}")},
+                "identifiers": {(DOMAIN, device_id)},
                 "name": f"Buffer {idx}",
                 "manufacturer": "Lambda",
-                "model": self._entry.data.get("firmware_version", "unknown"),
-                "via_device": (DOMAIN, self._entry.entry_id),
+                "model": fw_version,
+                "via_device": (DOMAIN, entry_id),
                 "entry_type": "service",
             }
         if device_type == "solar":
             idx = self._sensor_id[5]
+            device_id = f"{entry_id}_solar{idx}"
             return {
-                "identifiers": {(DOMAIN, f"{self._entry.entry_id}_solar{idx}")},
+                "identifiers": {(DOMAIN, device_id)},
                 "name": f"Solar {idx}",
                 "manufacturer": "Lambda",
-                "model": self._entry.data.get("firmware_version", "unknown"),
-                "via_device": (DOMAIN, self._entry.entry_id),
+                "model": fw_version,
+                "via_device": (DOMAIN, entry_id),
                 "entry_type": "service",
             }
         return None

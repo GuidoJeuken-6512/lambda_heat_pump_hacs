@@ -69,12 +69,23 @@ class LambdaConfigFlow(ConfigFlow, domain=DOMAIN):
 
         # Default-Werte aus bestehendem Eintrag holen, falls vorhanden
         current_entries = self._async_current_entries()
-        existing_data = current_entries[0].data if current_entries else {}
-        existing_options = dict(current_entries[0].options) if current_entries else {}
+        existing_data = (
+            current_entries[0].data if current_entries else {}
+        )
+        existing_options = (
+            dict(current_entries[0].options) if current_entries else {}
+        )
 
         # Pflichtfelder prüfen
-        required_fields = [CONF_NAME, CONF_HOST, CONF_PORT, CONF_SLAVE_ID]
-        if not all(k in user_input and user_input[k] for k in required_fields):
+        required_fields = [
+            CONF_NAME,
+            CONF_HOST,
+            CONF_PORT,
+            CONF_SLAVE_ID
+        ]
+        if not all(
+            k in user_input and user_input[k] for k in required_fields
+        ):
             # Formular anzeigen, wenn Eingaben fehlen
             firmware_options = list(FIRMWARE_VERSION.keys())
             return self.async_show_form(
@@ -84,13 +95,15 @@ class LambdaConfigFlow(ConfigFlow, domain=DOMAIN):
                         vol.Required(
                             CONF_NAME,
                             default=user_input.get(
-                                CONF_NAME, existing_data.get(CONF_NAME, DEFAULT_NAME)
+                                CONF_NAME,
+                                existing_data.get(CONF_NAME, DEFAULT_NAME)
                             ),
                         ): selector.TextSelector(),
                         vol.Required(
                             CONF_HOST,
                             default=user_input.get(
-                                CONF_HOST, existing_data.get(CONF_HOST, DEFAULT_HOST)
+                                CONF_HOST,
+                                existing_data.get(CONF_HOST, DEFAULT_HOST)
                             ),
                         ): selector.TextSelector(),
                         vol.Required(
@@ -114,7 +127,10 @@ class LambdaConfigFlow(ConfigFlow, domain=DOMAIN):
                             default=int(
                                 user_input.get(
                                     CONF_SLAVE_ID,
-                                    existing_data.get(CONF_SLAVE_ID, DEFAULT_SLAVE_ID),
+                                    existing_data.get(
+                                        CONF_SLAVE_ID,
+                                        DEFAULT_SLAVE_ID
+                                    ),
                                 )
                             ),
                         ): selector.NumberSelector(
@@ -130,7 +146,10 @@ class LambdaConfigFlow(ConfigFlow, domain=DOMAIN):
                             default=int(
                                 user_input.get(
                                     "num_hps",
-                                    existing_data.get("num_hps", DEFAULT_NUM_HPS),
+                                    existing_data.get(
+                                        "num_hps",
+                                        DEFAULT_NUM_HPS
+                                    ),
                                 )
                             ),
                         ): selector.NumberSelector(
@@ -146,7 +165,10 @@ class LambdaConfigFlow(ConfigFlow, domain=DOMAIN):
                             default=int(
                                 user_input.get(
                                     "num_boil",
-                                    existing_data.get("num_boil", DEFAULT_NUM_BOIL),
+                                    existing_data.get(
+                                        "num_boil",
+                                        DEFAULT_NUM_BOIL
+                                    ),
                                 )
                             ),
                         ): selector.NumberSelector(
@@ -162,7 +184,10 @@ class LambdaConfigFlow(ConfigFlow, domain=DOMAIN):
                             default=int(
                                 user_input.get(
                                     "num_hc",
-                                    existing_data.get("num_hc", DEFAULT_NUM_HC),
+                                    existing_data.get(
+                                        "num_hc",
+                                        DEFAULT_NUM_HC
+                                    ),
                                 )
                             ),
                         ): selector.NumberSelector(
@@ -178,7 +203,10 @@ class LambdaConfigFlow(ConfigFlow, domain=DOMAIN):
                             default=int(
                                 user_input.get(
                                     "num_buffer",
-                                    existing_data.get("num_buffer", DEFAULT_NUM_BUFFER),
+                                    existing_data.get(
+                                        "num_buffer",
+                                        DEFAULT_NUM_BUFFER
+                                    ),
                                 )
                             ),
                         ): selector.NumberSelector(
@@ -194,7 +222,10 @@ class LambdaConfigFlow(ConfigFlow, domain=DOMAIN):
                             default=int(
                                 user_input.get(
                                     "num_solar",
-                                    existing_data.get("num_solar", DEFAULT_NUM_SOLAR),
+                                    existing_data.get(
+                                        "num_solar",
+                                        DEFAULT_NUM_SOLAR
+                                    ),
                                 )
                             ),
                         ): selector.NumberSelector(
@@ -209,7 +240,10 @@ class LambdaConfigFlow(ConfigFlow, domain=DOMAIN):
                             "firmware_version",
                             default=user_input.get(
                                 "firmware_version",
-                                existing_data.get("firmware_version", DEFAULT_FIRMWARE),
+                                existing_data.get(
+                                    "firmware_version",
+                                    DEFAULT_FIRMWARE
+                                ),
                             ),
                         ): selector.SelectSelector(
                             selector.SelectSelectorConfig(
@@ -248,46 +282,54 @@ class LambdaConfigFlow(ConfigFlow, domain=DOMAIN):
                     "room_thermostat_control": user_input.get(
                         "room_thermostat_control",
                         existing_options.get(
-                            "room_thermostat_control", DEFAULT_ROOM_THERMOSTAT_CONTROL
+                            "room_thermostat_control",
+                            DEFAULT_ROOM_THERMOSTAT_CONTROL
                         ),
                     ),
                     "hot_water_min_temp": user_input.get(
                         "hot_water_min_temp",
                         existing_options.get(
-                            "hot_water_min_temp", DEFAULT_HOT_WATER_MIN_TEMP
+                            "hot_water_min_temp",
+                            DEFAULT_HOT_WATER_MIN_TEMP
                         ),
                     ),
                     "hot_water_max_temp": user_input.get(
                         "hot_water_max_temp",
                         existing_options.get(
-                            "hot_water_max_temp", DEFAULT_HOT_WATER_MAX_TEMP
+                            "hot_water_max_temp",
+                            DEFAULT_HOT_WATER_MAX_TEMP
                         ),
                     ),
                     "heating_circuit_min_temp": user_input.get(
                         "heating_circuit_min_temp",
                         existing_options.get(
-                            "heating_circuit_min_temp", DEFAULT_HEATING_CIRCUIT_MIN_TEMP
+                            "heating_circuit_min_temp",
+                            DEFAULT_HEATING_CIRCUIT_MIN_TEMP
                         ),
                     ),
                     "heating_circuit_max_temp": user_input.get(
                         "heating_circuit_max_temp",
                         existing_options.get(
-                            "heating_circuit_max_temp", DEFAULT_HEATING_CIRCUIT_MAX_TEMP
+                            "heating_circuit_max_temp",
+                            DEFAULT_HEATING_CIRCUIT_MAX_TEMP
                         ),
                     ),
                     "heating_circuit_temp_step": user_input.get(
                         "heating_circuit_temp_step",
                         existing_options.get(
                             "heating_circuit_temp_step",
-                            DEFAULT_HEATING_CIRCUIT_TEMP_STEP,
+                            DEFAULT_HEATING_CIRCUIT_TEMP_STEP
                         ),
                     ),
                     "firmware_version": user_input.get(
                         "firmware_version",
-                        existing_options.get("firmware_version", DEFAULT_FIRMWARE),
+                        existing_options.get(
+                            "firmware_version",
+                            DEFAULT_FIRMWARE
+                        ),
                     ),
                 }
-                logging.getLogger(__name__).debug(
+                _LOGGER.debug(
                     "ConfigFlow: Erstelle neuen Eintrag mit data=%s, options=%s",
                     user_input,
                     default_options,
@@ -310,26 +352,29 @@ class LambdaConfigFlow(ConfigFlow, domain=DOMAIN):
                     vol.Required(
                         CONF_NAME,
                         default=user_input.get(
-                            CONF_NAME, existing_data.get(CONF_NAME, DEFAULT_NAME)
+                            CONF_NAME,
+                            existing_data.get(CONF_NAME, DEFAULT_NAME)
                         ),
                     ): str,
                     vol.Required(
                         CONF_HOST,
                         default=user_input.get(
-                            CONF_HOST, existing_data.get(CONF_HOST, DEFAULT_HOST)
+                            CONF_HOST,
+                            existing_data.get(CONF_HOST, DEFAULT_HOST)
                         ),
                     ): str,
                     vol.Required(
                         CONF_PORT,
                         default=user_input.get(
-                            CONF_PORT, existing_data.get(CONF_PORT, DEFAULT_PORT)
+                            CONF_PORT,
+                            existing_data.get(CONF_PORT, DEFAULT_PORT)
                         ),
                     ): int,
                     vol.Required(
                         CONF_SLAVE_ID,
                         default=user_input.get(
                             CONF_SLAVE_ID,
-                            existing_data.get(CONF_SLAVE_ID, DEFAULT_SLAVE_ID),
+                            existing_data.get(CONF_SLAVE_ID, DEFAULT_SLAVE_ID)
                         ),
                     ): int,
                 }
@@ -352,7 +397,8 @@ class LambdaOptionsFlow(OptionsFlow):
     def __init__(self, config_entry: ConfigEntry) -> None:
         """Initialize options flow."""
         self._config_entry = config_entry
-        # Stelle sicher, dass options ein Dictionary ist und alle erforderlichen Schlüssel enthält
+        # Stelle sicher, dass options ein Dictionary ist
+        # und alle erforderlichen Schlüssel enthält
         self._options = {
             "room_thermostat_control": DEFAULT_ROOM_THERMOSTAT_CONTROL,
             "hot_water_min_temp": DEFAULT_HOT_WATER_MIN_TEMP,
@@ -371,7 +417,10 @@ class LambdaOptionsFlow(OptionsFlow):
         """Manage the options."""
         errors: dict[str, str] = {}
 
-        _LOGGER.debug("Options-Flow aufgerufen. Aktuelle Optionen: %s", self._options)
+        _LOGGER.debug(
+            "Options-Flow aufgerufen. Aktuelle Optionen: %s",
+            self._options
+        )
         if user_input is not None:
             _LOGGER.debug("Options-Flow user_input: %s", user_input)
             try:
@@ -381,18 +430,25 @@ class LambdaOptionsFlow(OptionsFlow):
                         user_input[key] = float(user_input[key])
 
                 # Validate the input
-                if user_input.get(
-                    "hot_water_min_temp", DEFAULT_HOT_WATER_MIN_TEMP
-                ) >= user_input.get("hot_water_max_temp", DEFAULT_HOT_WATER_MAX_TEMP):
+                min_temp = user_input.get(
+                    "hot_water_min_temp",
+                    DEFAULT_HOT_WATER_MIN_TEMP
+                )
+                max_temp = user_input.get(
+                    "hot_water_max_temp",
+                    DEFAULT_HOT_WATER_MAX_TEMP
+                )
+                if min_temp >= max_temp:
                     errors["hot_water_min_temp"] = "min_temp_higher"
                     errors["hot_water_max_temp"] = "max_temp_lower"
                 else:
-                    # Wenn room_thermostat_control aktiviert wurde, gehe zum Schritt für die Sensorauswahl
+                    # Wenn room_thermostat_control aktiviert wurde,
+                    # gehe zum Schritt für die Sensorauswahl
                     if user_input.get("room_thermostat_control", False):
                         self._options.update(user_input)
                         _LOGGER.debug(
                             "Options-Flow: Wechsel zu room_sensor mit Optionen: %s",
-                            self._options,
+                            self._options
                         )
                         return await self.async_step_room_sensor()
 
@@ -400,12 +456,17 @@ class LambdaOptionsFlow(OptionsFlow):
                     updated_options = dict(self._options)
                     updated_options.update(user_input)
                     _LOGGER.debug(
-                        "Options-Flow: Speichere Optionen: %s", updated_options
+                        "Options-Flow: Speichere Optionen: %s",
+                        updated_options
                     )
-                    return self.async_create_entry(title="", data=updated_options)
+                    return self.async_create_entry(
+                        title="",
+                        data=updated_options
+                    )
             except ValueError as ex:
                 _LOGGER.error(
-                    "Fehler bei der Konvertierung der Temperaturwerte: %s", ex
+                    "Fehler bei der Konvertierung der Temperaturwerte: %s",
+                    ex
                 )
                 errors["base"] = "invalid_temperature"
             except Exception as ex:  # pylint: disable=broad-except
@@ -415,34 +476,50 @@ class LambdaOptionsFlow(OptionsFlow):
         # Stelle sicher, dass die Standardwerte korrekt formatiert sind
         options = {
             "hot_water_min_temp": float(
-                self._options.get("hot_water_min_temp", DEFAULT_HOT_WATER_MIN_TEMP)
+                self._options.get(
+                    "hot_water_min_temp",
+                    DEFAULT_HOT_WATER_MIN_TEMP
+                )
             ),
             "hot_water_max_temp": float(
-                self._options.get("hot_water_max_temp", DEFAULT_HOT_WATER_MAX_TEMP)
+                self._options.get(
+                    "hot_water_max_temp",
+                    DEFAULT_HOT_WATER_MAX_TEMP
+                )
             ),
             "room_thermostat_control": bool(
                 self._options.get(
-                    "room_thermostat_control", DEFAULT_ROOM_THERMOSTAT_CONTROL
+                    "room_thermostat_control",
+                    DEFAULT_ROOM_THERMOSTAT_CONTROL
                 )
             ),
             "heating_circuit_min_temp": float(
                 self._options.get(
-                    "heating_circuit_min_temp", DEFAULT_HEATING_CIRCUIT_MIN_TEMP
+                    "heating_circuit_min_temp",
+                    DEFAULT_HEATING_CIRCUIT_MIN_TEMP
                 )
             ),
             "heating_circuit_max_temp": float(
                 self._options.get(
-                    "heating_circuit_max_temp", DEFAULT_HEATING_CIRCUIT_MAX_TEMP
+                    "heating_circuit_max_temp",
+                    DEFAULT_HEATING_CIRCUIT_MAX_TEMP
                 )
             ),
             "heating_circuit_temp_step": float(
                 self._options.get(
-                    "heating_circuit_temp_step", DEFAULT_HEATING_CIRCUIT_TEMP_STEP
+                    "heating_circuit_temp_step",
+                    DEFAULT_HEATING_CIRCUIT_TEMP_STEP
                 )
             ),
-            "firmware_version": self._options.get("firmware_version", DEFAULT_FIRMWARE),
+            "firmware_version": self._options.get(
+                "firmware_version",
+                DEFAULT_FIRMWARE
+            ),
         }
-        _LOGGER.debug("Config flow initialized with options: %s", options)
+        _LOGGER.debug(
+            "Config flow initialized with options: %s",
+            options
+        )
         try:
             return self.async_show_form(
                 step_id="init",
@@ -512,7 +589,9 @@ class LambdaOptionsFlow(OptionsFlow):
                             "firmware_version",
                             default=(
                                 self._options.get("firmware_version")
-                                or self._config_entry.data.get("firmware_version")
+                                or self._config_entry.data.get(
+                                    "firmware_version"
+                                )
                                 or DEFAULT_FIRMWARE
                             ),
                         ): selector.SelectSelector(
@@ -531,7 +610,8 @@ class LambdaOptionsFlow(OptionsFlow):
             )
         except Exception as ex:
             _LOGGER.exception(
-                "Options-Flow: Fehler beim Bauen des Schemas oder Anzeigen des Formulars: %s",
+                "Options-Flow: Fehler beim Bauen des Schemas oder "
+                "Anzeigen des Formulars: %s",
                 ex,
             )
             raise
