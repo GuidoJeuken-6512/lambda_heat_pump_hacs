@@ -32,7 +32,7 @@ from .const import (
     BUFFER_OPERATION_STATE,  # Import the missing constants
     BUFFER_REQUEST_TYPE,  # Import the missing constant
 )
-from .utils import get_compatible_sensors
+from .utils import get_compatible_sensors, build_device_info
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -467,76 +467,16 @@ class LambdaSensor(CoordinatorEntity, SensorEntity):
     def device_info(self):
         device_type = self._config.get("device_type")
         entry_id = self._entry.entry_id
-        fw_version = self._entry.data.get("firmware_version", "unknown")
-
-        if device_type == "main":
-            host = self._entry.data.get("host")
-            return {
-                "identifiers": {(DOMAIN, entry_id)},
-                "name": self._entry.data.get("name", "Lambda WP"),
-                "manufacturer": "Lambda",
-                "model": fw_version,
-                "configuration_url": f"http://{host}",
-                "sw_version": fw_version,
-                "entry_type": None,
-                "suggested_area": None,
-                "via_device": None,
-                "hw_version": None,
-                "serial_number": None,
-            }
+        # Index extraction logic for each device type
+        idx = None
         if device_type == "heat_pump":
             idx = self._sensor_id[2]
-            device_id = f"{entry_id}_hp{idx}"
-            return {
-                "identifiers": {(DOMAIN, device_id)},
-                "name": f"Heat Pump {idx}",
-                "manufacturer": "Lambda",
-                "model": fw_version,
-                "via_device": (DOMAIN, entry_id),
-                "entry_type": "service",
-            }
-        if device_type == "boiler":
+        elif device_type == "boiler":
             idx = self._sensor_id[4]
-            device_id = f"{entry_id}_boil{idx}"
-            return {
-                "identifiers": {(DOMAIN, device_id)},
-                "name": f"Boiler {idx}",
-                "manufacturer": "Lambda",
-                "model": fw_version,
-                "via_device": (DOMAIN, entry_id),
-                "entry_type": "service",
-            }
-        if device_type == "heating_circuit":
+        elif device_type == "heating_circuit":
             idx = self._sensor_id[2]
-            device_id = f"{entry_id}_hc{idx}"
-            return {
-                "identifiers": {(DOMAIN, device_id)},
-                "name": f"Heating Circuit {idx}",
-                "manufacturer": "Lambda",
-                "model": fw_version,
-                "via_device": (DOMAIN, entry_id),
-                "entry_type": "service",
-            }
-        if device_type == "buffer":
+        elif device_type == "buffer":
             idx = self._sensor_id[6]
-            device_id = f"{entry_id}_buffer{idx}"
-            return {
-                "identifiers": {(DOMAIN, device_id)},
-                "name": f"Buffer {idx}",
-                "manufacturer": "Lambda",
-                "model": fw_version,
-                "via_device": (DOMAIN, entry_id),
-                "entry_type": "service",
-            }
-        if device_type == "solar":
+        elif device_type == "solar":
             idx = self._sensor_id[5]
-            device_id = f"{entry_id}_solar{idx}"
-            return {
-                "identifiers": {(DOMAIN, device_id)},
-                "name": f"Solar {idx}",
-                "manufacturer": "Lambda",
-                "model": fw_version,
-                "via_device": (DOMAIN, entry_id),
-                "entry_type": "service",
-            }
-        return None
+        return build_device_info(self._entry, device_type, idx)

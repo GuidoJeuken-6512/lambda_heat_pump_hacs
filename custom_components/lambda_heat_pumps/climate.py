@@ -28,7 +28,10 @@ from .const import (
     DEFAULT_HEATING_CIRCUIT_MAX_TEMP,
     DEFAULT_HEATING_CIRCUIT_TEMP_STEP,
     DEFAULT_FIRMWARE,
+    BOIL_BASE_ADDRESS,
+    HC_BASE_ADDRESS,
 )
+from .utils import build_device_info
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -306,49 +309,15 @@ class LambdaClimateEntity(CoordinatorEntity, ClimateEntity):
     @property
     def device_info(self):
         """Return device information."""
-        # Hauptgerät für Boiler/HC: climate_type hot_water_X oder HC_X
+        # Use the shared utility for device info
         if self._climate_type.startswith("hot_water"):
             idx = self._climate_type.split("_")[-1]
-            entry_id = self._entry.entry_id
-            device_id = f"{entry_id}_boil{idx}"
-            return {
-                "identifiers": {(DOMAIN, device_id)},
-                "name": f"Boiler {idx}",
-                "manufacturer": "Lambda",
-                "model": self._entry.data.get(
-                    "firmware_version",
-                    "unknown",
-                ),
-                "via_device": (DOMAIN, entry_id),
-                "entry_type": "service",
-            }
+            return build_device_info(self._entry, "boiler", idx)
         if self._climate_type.startswith("heating_circuit"):
             idx = self._climate_type.split("_")[-1]
-            entry_id = self._entry.entry_id
-            device_id = f"{entry_id}_hc{idx}"
-            return {
-                "identifiers": {(DOMAIN, device_id)},
-                "name": f"Heating Circuit {idx}",
-                "manufacturer": "Lambda",
-                "model": self._entry.data.get(
-                    "firmware_version",
-                    "unknown",
-                ),
-                "via_device": (DOMAIN, entry_id),
-                "entry_type": "service",
-            }
-        # Fallback: Hauptgerät
-        entry_id = self._entry.entry_id
-        host = self._entry.data.get("host")
-        fw_version = self._entry.data.get("firmware_version", "unknown")
-        return {
-            "identifiers": {(DOMAIN, entry_id)},
-            "name": self._entry.data.get("name", "Lambda WP"),
-            "manufacturer": "Lambda",
-            "model": fw_version,
-            "configuration_url": f"http://{host}",
-            "sw_version": fw_version,
-        }
+            return build_device_info(self._entry, "heating_circuit", idx)
+        # Fallback: main device
+        return build_device_info(self._entry, "main")
 
     async def async_set_temperature(self, **kwargs: Any) -> None:
         """Set new target temperature."""
@@ -363,8 +332,6 @@ class LambdaClimateEntity(CoordinatorEntity, ClimateEntity):
                 if len(parts) == 2 and parts[1] in BOIL_SENSOR_TEMPLATES:
                     sensor_info = BOIL_SENSOR_TEMPLATES[parts[1]].copy()
                     idx = int(self._target_temp_sensor[4])
-                    from .const import BOIL_BASE_ADDRESS
-
                     sensor_info["address"] = (
                         BOIL_BASE_ADDRESS[idx]
                         + sensor_info["relative_address"]
@@ -374,8 +341,6 @@ class LambdaClimateEntity(CoordinatorEntity, ClimateEntity):
                 if len(parts) == 2 and parts[1] in HC_SENSOR_TEMPLATES:
                     sensor_info = HC_SENSOR_TEMPLATES[parts[1]].copy()
                     idx = int(self._target_temp_sensor[2])
-                    from .const import HC_BASE_ADDRESS
-
                     sensor_info["address"] = (
                         HC_BASE_ADDRESS[idx]
                         + sensor_info["relative_address"]
