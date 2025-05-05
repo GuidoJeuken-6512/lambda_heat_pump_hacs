@@ -29,8 +29,8 @@ from .const import (
     SOLAR_SENSOR_TEMPLATES,
     SOLAR_BASE_ADDRESS,
     SOLAR_OPERATION_STATE,
-    BUFFER_OPERATION_STATE,  # Import the missing constants
-    BUFFER_REQUEST_TYPE,  # Import the missing constant
+    BUFFER_OPERATION_STATE,
+    BUFFER_REQUEST_TYPE,
 )
 from .utils import get_compatible_sensors, build_device_info
 
@@ -45,7 +45,6 @@ async def async_setup_entry(
     """Set up Lambda sensor entries."""
     coordinator = hass.data[DOMAIN][entry.entry_id]["coordinator"]
 
-    # Hole die konfigurierte Firmware-Version
     configured_fw = entry.options.get(
         "firmware_version", entry.data.get("firmware_version", "V0.0.4-3K")
     )
@@ -61,11 +60,9 @@ async def async_setup_entry(
         FIRMWARE_VERSION,
     )
 
-    # Erstelle eine Liste von Sensoren basierend auf der Firmware-Version
     entities = []
     name_prefix = entry.data.get("name", "lambda").lower().replace(" ", "")
 
-    # Statische Sensoren mit Prefix und angepasstem Friendly Name versehen
     compatible_static_sensors = get_compatible_sensors(SENSOR_TYPES, fw_version)
     for sensor_id, sensor_config in compatible_static_sensors.items():
         sensor_fw = sensor_config.get("firmware_version", 1)
@@ -80,7 +77,6 @@ async def async_setup_entry(
             is_compatible,
             sensor_config,
         )
-        # sensor_id bleibt unverändert (ohne Prefix)
         sensor_config_with_name = sensor_config.copy()
         if not sensor_config["name"].upper().startswith(name_prefix.upper()):
             sensor_config_with_name[
@@ -97,7 +93,6 @@ async def async_setup_entry(
             )
         )
 
-    # Dynamische Generierung der HP-Sensoren
     compatible_hp_templates = get_compatible_sensors(
         HP_SENSOR_TEMPLATES,
         fw_version,
@@ -109,7 +104,6 @@ async def async_setup_entry(
     )
     for hp_idx in range(1, num_hps + 1):
         for template_key, template in compatible_hp_templates.items():
-            # Korrekte sensor_id: <name>_hp<idx>_<template_key>
             sensor_id = f"hp{hp_idx}_{template_key}"
             address = HP_BASE_ADDRESS[hp_idx] + template["relative_address"]
             sensor_config = template.copy()
@@ -135,7 +129,6 @@ async def async_setup_entry(
         len(entities) - len(compatible_static_sensors),
     )
 
-    # Dynamische Generierung der Boiler-Sensoren
     compatible_boil_templates = get_compatible_sensors(
         BOIL_SENSOR_TEMPLATES,
         fw_version,
@@ -147,7 +140,6 @@ async def async_setup_entry(
     )
     for boil_idx in range(1, num_boil + 1):
         for template_key, template in compatible_boil_templates.items():
-            # Korrekte sensor_id: <name>_boil<idx>_<template_key>
             sensor_id = f"boil{boil_idx}_{template_key}"
             address = BOIL_BASE_ADDRESS[boil_idx] + template["relative_address"]
             sensor_config = template.copy()
@@ -177,7 +169,6 @@ async def async_setup_entry(
         len(entities) - len(compatible_static_sensors),
     )
 
-    # Dynamische Generierung der HC-Sensoren
     compatible_hc_templates = get_compatible_sensors(
         HC_SENSOR_TEMPLATES,
         fw_version,
@@ -217,7 +208,6 @@ async def async_setup_entry(
         - num_boil * len(compatible_boil_templates),
     )
 
-    # Dynamische Generierung der Buffer-Sensoren
     compatible_buffer_templates = get_compatible_sensors(
         BUFFER_SENSOR_TEMPLATES,
         fw_version,
@@ -259,7 +249,6 @@ async def async_setup_entry(
         - num_hc * len(compatible_hc_templates),
     )
 
-    # Dynamische Generierung der Solar-Sensoren
     compatible_solar_templates = get_compatible_sensors(
         SOLAR_SENSOR_TEMPLATES,
         fw_version,
@@ -333,12 +322,9 @@ class LambdaSensor(CoordinatorEntity, SensorEntity):
             sensor_config,
         )
 
-        # Verbesserte Erkennung von Zustandssensoren
-        # Prüfe zuerst, ob es ein Temperatursensor ist
         if sensor_config.get("unit") == "°C":
             self._is_state_sensor = False
         else:
-            # Nur wenn es kein Temperatursensor ist, prüfe auf Zustandssensor
             state_patterns = [
                 "_operating_state",
                 "_error_state",
@@ -351,19 +337,15 @@ class LambdaSensor(CoordinatorEntity, SensorEntity):
                 pattern in sensor_id for pattern in state_patterns
             )
 
-        # Setze Attribute basierend auf Sensortyp
         if self._is_state_sensor:
             self._attr_native_unit_of_measurement = None
             self._attr_device_class = None
             self._attr_state_class = None
-            # Für Zustandssensoren keine Genauigkeit setzen
         else:
             self._attr_native_unit_of_measurement = sensor_config["unit"]
-            # Setze die Genauigkeit für numerische Sensoren
             if "precision" in sensor_config:
                 self._attr_suggested_display_precision = sensor_config["precision"]
 
-            # Bestimme die Device-Klasse basierend auf der Einheit
             if sensor_config["unit"] == "°C":
                 self._attr_device_class = SensorDeviceClass.TEMPERATURE
             elif sensor_config["unit"] == "W":
@@ -382,7 +364,6 @@ class LambdaSensor(CoordinatorEntity, SensorEntity):
         if value is None:
             return None
 
-        # Check if the sensor is a state sensor and map the value to text using the dictionaries in const.py
         if self._is_state_sensor:
             from .const import (
                 AMBIENT_OPERATING_STATE,
@@ -396,13 +377,11 @@ class LambdaSensor(CoordinatorEntity, SensorEntity):
                 CIRCULATION_PUMP_STATE,
             )
 
-            # Ensure value is an integer for state mapping
             try:
                 numeric_value = int(value)
             except (ValueError, TypeError):
                 return f"Unknown state ({value})"
 
-            # Verbesserte Zuordnung der State-Mappings
             state_mapping = None
             if "ambient_operating_state" in self._sensor_id:
                 state_mapping = AMBIENT_OPERATING_STATE
@@ -446,28 +425,25 @@ class LambdaSensor(CoordinatorEntity, SensorEntity):
                 )
             return f"Unknown mapping for state ({numeric_value})"
 
-        # Return the raw value for non-state sensors
         return value
 
     @property
     def device_class(self) -> str | None:
         """Return the device class of the sensor."""
         if "state" in self._sensor_id or "mode" in self._sensor_id:
-            return None  # State/mode sensors do not have a numeric device class
+            return None
         return super().device_class
 
     @property
     def state_class(self) -> str | None:
         """Return the state class of the sensor."""
         if "state" in self._sensor_id or "mode" in self._sensor_id:
-            return None  # State/mode sensors do not have a numeric state class
+            return None
         return super().state_class
 
     @property
     def device_info(self):
         device_type = self._config.get("device_type")
-        entry_id = self._entry.entry_id
-        # Index extraction logic for each device type
         idx = None
         if device_type == "heat_pump":
             idx = self._sensor_id[2]

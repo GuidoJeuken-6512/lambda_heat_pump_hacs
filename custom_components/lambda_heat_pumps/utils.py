@@ -12,7 +12,9 @@ def get_compatible_sensors(sensor_templates: dict, fw_version: int) -> dict:
         if v.get("firmware_version", 1) <= fw_version
     }
 
+
 def build_device_info(entry, device_type, idx=None, sensor_id=None):
+    # sensor_id argument is unused, kept for interface compatibility
     DOMAIN = entry.domain if hasattr(entry, 'domain') else 'lambda'
     entry_id = entry.entry_id
     fw_version = entry.data.get("firmware_version", "unknown")

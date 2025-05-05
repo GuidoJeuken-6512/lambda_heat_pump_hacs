@@ -45,7 +45,7 @@ _LOGGER = logging.getLogger(__name__)
 
 async def validate_input(hass: HomeAssistant, data: dict[str, Any]) -> None:
     """Validate the user input allows us to connect."""
-    # Validation will be added later
+    # hass and data arguments are unused, kept for interface compatibility
     pass
 
 
@@ -272,7 +272,9 @@ class LambdaConfigFlow(ConfigFlow, domain=DOMAIN):
 
             # Ergänze fehlende Pflichtfelder aus existing_data oder Default
             if CONF_NAME not in user_input or not user_input[CONF_NAME]:
-                user_input[CONF_NAME] = existing_data.get(CONF_NAME, DEFAULT_NAME)
+                user_input[CONF_NAME] = existing_data.get(
+                    CONF_NAME, DEFAULT_NAME
+                )
             await validate_input(self.hass, user_input)
             if CONF_NAME not in user_input or not user_input[CONF_NAME]:
                 errors["base"] = "name_required"
@@ -388,6 +390,7 @@ class LambdaConfigFlow(ConfigFlow, domain=DOMAIN):
         config_entry: ConfigEntry,
     ) -> OptionsFlow:
         """Create the options flow."""
+        # config_entry argument is unused, kept for interface compatibility
         return LambdaOptionsFlow(config_entry)
 
 
@@ -635,7 +638,9 @@ class LambdaOptionsFlow(OptionsFlow):
                         del self._options[entity_key]
                 return self.async_create_entry(title="", data=self._options)
             except Exception:
-                _LOGGER.exception("Unexpected exception in room sensor selection")
+                _LOGGER.exception(
+                    "Unexpected exception in room sensor selection"
+                )
                 errors["base"] = "unknown"
 
         # Hole alle Entities, die NICHT zur eigenen Integration gehören
@@ -682,7 +687,7 @@ class LambdaOptionsFlow(OptionsFlow):
 
     async def _test_connection(self, user_input: dict[str, Any]) -> None:
         """Test the connection to the Lambda device."""
-        # Connection test will be implemented later
+        # user_input argument is unused, kept for interface compatibility
         pass
 
 

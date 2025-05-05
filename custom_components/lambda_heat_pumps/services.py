@@ -34,12 +34,14 @@ UPDATE_ROOM_TEMPERATURE_SCHEMA = vol.Schema(
 
 async def async_setup_services(hass: HomeAssistant) -> None:
     """Set up Lambda WP services."""
+    # hass argument is used, no change needed
     _LOGGER.debug("Service setup completed successfully")
     # Speichere die Unsubscribe-Funktionen pro Entry, um sie später entfernen zu können
     unsub_update_callbacks = {}
 
     async def async_update_room_temperature(call: ServiceCall) -> None:
         """Update room temperature from the selected sensor to Modbus register."""
+        # call argument is used, no change needed
         # Hole alle Lambda-Integrationen
         lambda_entries = hass.data.get(DOMAIN, {})
         _LOGGER.debug("[Service] Lambda entries: %s", list(lambda_entries.keys()))
@@ -53,15 +55,21 @@ async def async_setup_services(hass: HomeAssistant) -> None:
         for entry_id, entry_data in lambda_entries.items():
             config_entry = hass.config_entries.async_get_entry(entry_id)
             if not config_entry or not config_entry.options:
-                _LOGGER.debug("No config entry or options for entry_id %s", entry_id)
+                _LOGGER.debug(
+                    "No config entry or options for entry_id %s",
+                    entry_id,
+                )
                 continue
             _LOGGER.debug(
-                "[Service] Options for entry_id %s: %s", entry_id, config_entry.options
+                "[Service] Options for entry_id %s: %s",
+                entry_id,
+                config_entry.options,
             )
             # Prüfe, ob Raumthermostat aktiviert ist
             if not config_entry.options.get("room_thermostat_control", False):
                 _LOGGER.debug(
-                    "Room thermostat control not enabled for entry_id %s", entry_id
+                    "Room thermostat control not enabled for entry_id %s",
+                    entry_id,
                 )
                 continue
 
@@ -69,10 +77,12 @@ async def async_setup_services(hass: HomeAssistant) -> None:
             num_hc = config_entry.data.get("num_hc", 1)
             _LOGGER.debug("[Service] num_hc for entry_id %s: %s", entry_id, num_hc)
 
-            # Wenn eine spezifische Entity-ID angegeben wurde und nicht übereinstimmt, überspringe
+            # Wenn eine spezifische Entity-ID angegeben wurde und nicht übereinstimmt, 
+            # überspringe
             if target_entity_id and target_entity_id != entry_id:
                 _LOGGER.debug(
-                    "Skipping entry_id %s due to ATTR_ENTITY_ID filter", entry_id
+                    "Skipping entry_id %s due to ATTR_ENTITY_ID filter",
+                    entry_id,
                 )
                 continue
 
@@ -90,14 +100,16 @@ async def async_setup_services(hass: HomeAssistant) -> None:
                 entity_key = CONF_ROOM_TEMPERATURE_ENTITY.format(hc_idx)
                 room_temp_entity_id = config_entry.options.get(entity_key)
                 _LOGGER.debug(
-                    "[Service] Prüfe Heizkreis %s: entity_key=%s, room_temp_entity_id=%s",
+                    "[Service] Prüfe Heizkreis %s: entity_key=%s, "
+                    "room_temp_entity_id=%s",
                     hc_idx,
                     entity_key,
                     room_temp_entity_id,
                 )
                 if not room_temp_entity_id:
                     _LOGGER.debug(
-                        "No room temperature entity selected for heating circuit %s in entry_id %s",
+                        "No room temperature entity selected for heating circuit %s "
+                        "in entry_id %s",
                         hc_idx,
                         entry_id,
                     )
@@ -112,7 +124,8 @@ async def async_setup_services(hass: HomeAssistant) -> None:
                     "",
                 ):
                     _LOGGER.warning(
-                        "Room temperature entity %s is not available for heating circuit %s (state: %s)",
+                        "Room temperature entity %s is not available for heating "
+                        "circuit %s (state: %s)",
                         room_temp_entity_id,
                         hc_idx,
                         state.state if state else None,
@@ -132,7 +145,8 @@ async def async_setup_services(hass: HomeAssistant) -> None:
 
                     # Debug-Eintrag anstatt tatsächlich ins Modbus-Register zu schreiben
                     _LOGGER.info(
-                        "Simuliere Modbus write auf Register %s mit Wert %s (Temperatur: %s°C) für Heizkreis %s, entry_id %s",
+                        "Simuliere Modbus write auf Register %s mit Wert %s "
+                        "(Temperatur: %s°C) für Heizkreis %s, entry_id %s",
                         register_address,
                         raw_value,
                         temperature,
@@ -140,7 +154,8 @@ async def async_setup_services(hass: HomeAssistant) -> None:
                         entry_id,
                     )
 
-                    # Kein tatsächlicher Modbus-Schreibvorgang! Ab hier auskommentieren, wenn Modbus-Schreibvorgang deaktiviert werden soll.
+                    # Kein tatsächlicher Modbus-Schreibvorgang! Ab hier auskommentieren,
+                    # wenn Modbus-Schreibvorgang deaktiviert werden soll.
                     result = await hass.async_add_executor_job(
                         coordinator.client.write_registers,
                         register_address,
@@ -153,7 +168,8 @@ async def async_setup_services(hass: HomeAssistant) -> None:
 
                 except (ValueError, TypeError) as ex:
                     _LOGGER.error(
-                        "Unable to convert temperature from %s for heating circuit %s: %s",
+                        "Unable to convert temperature from %s for heating circuit %s: "
+                        "%s",
                         room_temp_entity_id,
                         hc_idx,
                         ex,
@@ -169,6 +185,7 @@ async def async_setup_services(hass: HomeAssistant) -> None:
     @callback
     def setup_scheduled_updates() -> None:
         """Set up scheduled updates for all entries."""
+        # No arguments, no change needed
         # Bestehende Unsubscriber entfernen
         for unsub in unsub_update_callbacks.values():
             unsub()
@@ -196,7 +213,8 @@ async def async_setup_services(hass: HomeAssistant) -> None:
 
             if not has_sensor:
                 _LOGGER.debug(
-                    "No room temperature sensors configured for entry_id %s", entry_id
+                    "No room temperature sensors configured for entry_id %s",
+                    entry_id,
                 )
                 continue
 
@@ -208,6 +226,8 @@ async def async_setup_services(hass: HomeAssistant) -> None:
 
             # Timer einrichten
             async def scheduled_update_callback(_):
+                """Scheduled update callback."""
+                # _ argument is unused, kept for interface compatibility
                 await async_update_room_temperature(
                     ServiceCall(DOMAIN, "update_room_temperature", service_data)
                 )

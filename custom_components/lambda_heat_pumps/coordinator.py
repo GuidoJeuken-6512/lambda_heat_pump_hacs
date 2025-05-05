@@ -68,7 +68,9 @@ class LambdaDataUpdateCoordinator(DataUpdateCoordinator):
             if not await self.hass.async_add_executor_job(self.client.connect):
                 raise ConnectionError("Could not connect to Modbus TCP")
             _LOGGER.debug(
-                "Modbus client initialized for host %s on port %s", self.host, self.port
+                "Modbus client initialized for host %s on port %s",
+                self.host,
+                self.port,
             )
 
         try:
@@ -125,7 +127,8 @@ class LambdaDataUpdateCoordinator(DataUpdateCoordinator):
                     )
                     try:
                         _LOGGER.debug(
-                            "Attempting to read Modbus register for sensor %s at address %d with count %d",
+                            "Attempting to read Modbus register for sensor %s at "
+                            "address %d with count %d",
                             sensor_id,
                             address,
                             count,
@@ -180,7 +183,8 @@ class LambdaDataUpdateCoordinator(DataUpdateCoordinator):
                     count = 2 if template["data_type"] == "int32" else 1
                     try:
                         _LOGGER.debug(
-                            "Attempting to read Modbus register for boiler sensor %s at address %d with count %d",
+                            "Attempting to read Modbus register for boiler sensor %s "
+                            "at address %d with count %d",
                             sensor_id,
                             address,
                             count,
@@ -235,7 +239,8 @@ class LambdaDataUpdateCoordinator(DataUpdateCoordinator):
                     count = 2 if template["data_type"] == "int32" else 1
                     try:
                         _LOGGER.debug(
-                            "Attempting to read Modbus register for HC sensor %s at address %d with count %d",
+                            "Attempting to read Modbus register for HC sensor %s at "
+                            "address %d with count %d",
                             sensor_id,
                             address,
                             count,
@@ -289,7 +294,8 @@ class LambdaDataUpdateCoordinator(DataUpdateCoordinator):
                     count = 2 if template["data_type"] == "int32" else 1
                     try:
                         _LOGGER.debug(
-                            "Attempting to read Modbus register for Buffer sensor %s at address %d with count %d",
+                            "Attempting to read Modbus register for Buffer sensor %s "
+                            "at address %d with count %d",
                             sensor_id,
                             address,
                             count,
@@ -345,7 +351,8 @@ class LambdaDataUpdateCoordinator(DataUpdateCoordinator):
                     count = 2 if template["data_type"] == "int32" else 1
                     try:
                         _LOGGER.debug(
-                            "Attempting to read Modbus register for Solar sensor %s at address %d with count %d",
+                            "Attempting to read Modbus register for Solar sensor %s at "
+                            "address %d with count %d",
                             sensor_id,
                             address,
                             count,

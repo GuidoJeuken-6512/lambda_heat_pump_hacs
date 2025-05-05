@@ -321,6 +321,7 @@ class LambdaClimateEntity(CoordinatorEntity, ClimateEntity):
 
     async def async_set_temperature(self, **kwargs: Any) -> None:
         """Set new target temperature."""
+        # kwargs is used, no change needed
         if (temperature := kwargs.get(ATTR_TEMPERATURE)) is None:
             return
 

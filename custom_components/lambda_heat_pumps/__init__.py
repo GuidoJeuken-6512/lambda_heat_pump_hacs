@@ -21,6 +21,7 @@ TRANSLATION_SOURCES = {DOMAIN: "translations"}
 
 def setup_debug_logging(hass: HomeAssistant, config: ConfigType) -> None:
     """Set up debug logging for the integration."""
+    # hass argument is unused, kept for interface compatibility
     if config.get("debug", False):
         logging.getLogger(DEBUG_PREFIX).setLevel(logging.DEBUG)
         _LOGGER.info("Debug logging enabled for %s", DEBUG_PREFIX)
