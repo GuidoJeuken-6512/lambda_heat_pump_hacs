@@ -1,0 +1,7 @@
+{
+    "name": "Lambda Heat Pumps",
+    "render_readme": true,
+    "domains": ["climate", "sensor"],
+    "homeassistant": "2024.4.4",
+    "iot_class": "Local Push"
+} 

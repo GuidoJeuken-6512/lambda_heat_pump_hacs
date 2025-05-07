@@ -1,0 +1,77 @@
+# Ignore everything
+*
+
+# But not custom_components
+!custom_components/
+!custom_components/lambda_heat_pumps/
+!custom_components/lambda_heat_pumps/**/*.py
+!custom_components/lambda_heat_pumps/**/*.yaml
+!custom_components/lambda_heat_pumps/**/*.json
+!custom_components/lambda_heat_pumps/translations/
+!custom_components/lambda_heat_pumps/translations/**/*.json
+
+# And not these files
+!.gitignore
+!hacs.json
+!LICENSE
+!README.md
+!requirements.txt
+!requirements_test.txt
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual Environment
+.env
+.venv
+env/
+venv/
+ENV/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+
+# Testing
+.coverage
+.pytest_cache/
+htmlcov/
+.tox/
+.nox/
+.coverage.*
+coverage.xml
+*.cover
+
+# Home Assistant specific
+.storage/
+.cloud/
+deps/
+blueprints/
+tts/
+automations.yaml
+scenes.yaml
+scripts.yaml
+secrets.yaml
+configuration.yaml 
