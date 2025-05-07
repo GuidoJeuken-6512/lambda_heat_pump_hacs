@@ -1,5 +1,5 @@
 import unittest
-from lambda_heat_pumps.const import DOMAIN, DEFAULT_NAME
+from custom_components.lambda_heat_pumps.const import DOMAIN, DEFAULT_NAME
 
 class TestConst(unittest.TestCase):
     def test_constants(self):

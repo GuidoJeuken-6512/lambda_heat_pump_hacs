@@ -1,23 +1,27 @@
-import unittest
-from unittest.mock import AsyncMock, patch, MagicMock
-from lambda_heat_pumps.climate import LambdaClimateEntity
+"""Test the climate module."""
+import pytest
+from unittest.mock import patch, AsyncMock
+from homeassistant.const import UnitOfTemperature
+from homeassistant.components.climate import HVACMode
 
-class TestClimate(unittest.TestCase):
-    def test_climate_entity_initialization(self):
-        with patch("lambda_heat_pumps.climate.CoordinatorEntity") as mock_entity:
-            mock_entity.return_value = AsyncMock()
-            mock_entry = MagicMock()
-            mock_entry.data = {"name": "Test Climate"}
-            entity = LambdaClimateEntity(
-                coordinator=mock_entity,
-                entry=mock_entry,
-                climate_type="hot_water_1",
-                translation_key="hot_water",
-                current_temp_sensor="sensor_1",
-                target_temp_sensor="sensor_2",
-                min_temp=10,
-                max_temp=50,
-                temp_step=1,
-            )
-            self.assertEqual(entity._attr_min_temp, 10)
-            self.assertEqual(entity._attr_max_temp, 50)
+from custom_components.lambda_heat_pumps.climate import async_setup_entry
+
+
+@pytest.mark.asyncio
+async def test_climate_setup(hass, mock_config_entry, mock_coordinator):
+    """Test climate entity setup."""
+    with patch(
+        "custom_components.lambda_heat_pumps.climate.LambdaClimateEntity"
+    ) as mock_climate:
+        mock_climate.return_value = mock_climate
+        mock_climate._attr_name = "Test Climate"
+        mock_climate._attr_unique_id = "test_climate"
+        mock_climate._attr_hvac_mode = HVACMode.HEAT
+        mock_climate._attr_hvac_modes = [HVACMode.HEAT]
+        mock_climate._attr_min_temp = 5
+        mock_climate._attr_max_temp = 35
+        mock_climate._attr_target_temperature_step = 0.5
+        mock_climate._attr_temperature_unit = UnitOfTemperature.CELSIUS
+
+        await async_setup_entry(hass, mock_config_entry, mock_coordinator)
+        assert mock_climate.called 

@@ -9,6 +9,8 @@
 !custom_components/lambda_heat_pumps/**/*.json
 !custom_components/lambda_heat_pumps/translations/
 !custom_components/lambda_heat_pumps/translations/**/*.json
+!docs/
+
 
 # And not these files
 !.gitignore
@@ -17,6 +19,11 @@
 !README.md
 !requirements.txt
 !requirements_test.txt
+
+# GitHub Actions Workflows
+!.github/
+!.github/workflows/
+!.github/workflows/*.yml
 
 # Python
 __pycache__/
@@ -74,4 +81,4 @@ automations.yaml
 scenes.yaml
 scripts.yaml
 secrets.yaml
-configuration.yaml 
+configuration.yaml

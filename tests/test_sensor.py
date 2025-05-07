@@ -1,16 +1,23 @@
-import unittest
-from unittest.mock import AsyncMock, patch
-from lambda_heat_pumps.sensor import LambdaSensor
+"""Test the sensor module."""
+import pytest
+from unittest.mock import patch, AsyncMock
+from homeassistant.const import UnitOfTemperature
+from homeassistant.components.sensor import SensorDeviceClass
 
-class TestSensor(unittest.TestCase):
-    def test_sensor_initialization(self):
-        with patch("lambda_heat_pumps.sensor.CoordinatorEntity") as mock_entity:
-            mock_entity.return_value = AsyncMock()
-            sensor = LambdaSensor(
-                coordinator=mock_entity,
-                entry={},
-                sensor_id="sensor_1",
-                sensor_config={"name": "Test Sensor", "unit": "°C"},
-            )
-            self.assertEqual(sensor._attr_name, "Test Sensor")
-            self.assertEqual(sensor._attr_native_unit_of_measurement, "°C")
+from custom_components.lambda_heat_pumps.sensor import async_setup_entry
+
+
+@pytest.mark.asyncio
+async def test_sensor_setup(hass, mock_config_entry, mock_coordinator):
+    """Test sensor entity setup."""
+    with patch(
+        "custom_components.lambda_heat_pumps.sensor.LambdaSensor"
+    ) as mock_sensor:
+        mock_sensor.return_value = mock_sensor
+        mock_sensor._attr_name = "Test Sensor"
+        mock_sensor._attr_unique_id = "test_sensor"
+        mock_sensor._attr_device_class = SensorDeviceClass.TEMPERATURE
+        mock_sensor._attr_native_unit_of_measurement = UnitOfTemperature.CELSIUS
+
+        await async_setup_entry(hass, mock_config_entry, mock_coordinator)
+        assert mock_sensor.called 

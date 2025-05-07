@@ -8,6 +8,6 @@
   "requirements": ["pymodbus==3.6.1"],
   "codeowners": ["@GuidoJeuken-6512"],
   "iot_class": "local_polling",
-  "min_ha_version": "2025.3.0",
+  "min_ha_version": "2024.4.4",
   "translations": ["translations/de.json", "translations/en.json"]
 }
