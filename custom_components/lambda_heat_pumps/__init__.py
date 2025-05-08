@@ -13,9 +13,9 @@ from .services import async_setup_services, async_unload_services
 
 _LOGGER = logging.getLogger(__name__)
 SCAN_INTERVAL = timedelta(seconds=30)
+VERSION = "1.0.0"
 
-# Diese Konstante teilt Home Assistant mit, d
-# ass die Integration Übersetzungen hat
+# Diese Konstante teilt Home Assistant mit, dass die Integration Übersetzungen hat
 TRANSLATION_SOURCES = {DOMAIN: "translations"}
 
 

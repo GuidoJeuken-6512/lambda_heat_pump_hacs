@@ -8,4 +8,4 @@ update_room_temperature:
       required: false
       selector:
         entity:
-          integration: lambda 
+          integration: lambda_heat_pumps 

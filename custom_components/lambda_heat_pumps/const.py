@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 # Integration Constants
-DOMAIN = "lambda"
+DOMAIN = "lambda_heat_pumps"
 DEFAULT_NAME = "EU08L"
 DEFAULT_HOST = "192.168.178.194"
 DEFAULT_PORT = 5020

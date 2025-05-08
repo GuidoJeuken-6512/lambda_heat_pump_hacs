@@ -1,6 +1,6 @@
 {
-  "domain": "lambda",
-  "name": "Lambda Heat Pump",
+  "domain": "lambda_heat_pumps",
+  "name": "Lambda Heat Pumps",
   "version": "1.0.0",
   "config_flow": true,
   "documentation": "https://github.com/GuidoJeuken-6512/lambda",
@@ -8,6 +8,6 @@
   "requirements": ["pymodbus==3.6.1"],
   "codeowners": ["@GuidoJeuken-6512"],
   "iot_class": "local_polling",
-  "min_ha_version": "2024.4.4",
+  "min_ha_version": "2024.3.3",
   "translations": ["translations/de.json", "translations/en.json"]
 }
