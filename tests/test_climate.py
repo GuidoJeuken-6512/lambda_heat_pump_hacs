@@ -1,36 +1,37 @@
 # File: tests/test_climate.py
-"""Test climate platform."""
-from unittest.mock import AsyncMock, MagicMock, patch
-
+"""Tests for the Lambda Heat Pumps climate platform."""
 import pytest
+from unittest.mock import patch, MagicMock
 from homeassistant.components.climate import HVACMode
 from homeassistant.const import UnitOfTemperature
-from homeassistant.core import HomeAssistant
-from homeassistant.config_entries import ConfigEntry
-from homeassistant.helpers.entity_platform import AddEntitiesCallback
-
-from custom_components.lambda_heat_pumps.climate import (
-    async_setup_entry,
-    LambdaClimateEntity,
-)
+from custom_components.lambda_heat_pumps.climate import async_setup_entry
 from custom_components.lambda_heat_pumps.const import DOMAIN
+from pytest_homeassistant_custom_component.common import MockConfigEntry
+
+pytestmark = pytest.mark.asyncio
 
 @pytest.fixture
 def mock_config_entry():
     """Create a mock config entry."""
-    entry = MagicMock(spec=ConfigEntry)
-    entry.entry_id = "test"
-    entry.data = {"name": "test", "slave_id": 1}
-    entry.options = {}
-    return entry
+    return MockConfigEntry(
+        domain=DOMAIN,
+        data={
+            "host": "192.168.1.100",
+            "port": 502,
+            "unit_id": 1,
+        },
+        entry_id="test_entry_id",
+    )
 
 @pytest.fixture
 def mock_coordinator():
     """Create a mock coordinator."""
-    coordinator = AsyncMock()
-    coordinator.data = {}
-    coordinator.async_write_register = AsyncMock()
-    coordinator.async_refresh = AsyncMock()
+    coordinator = MagicMock()
+    coordinator.data = {
+        "temperature": 20.0,
+        "target_temperature": 22.0,
+        "hvac_mode": HVACMode.HEAT,
+    }
     return coordinator
 
 @pytest.mark.asyncio
@@ -56,13 +57,13 @@ async def test_climate_setup(hass, mock_config_entry, mock_coordinator):
 @pytest.mark.asyncio
 async def test_lambda_climate_entity_properties():
     """Test properties of LambdaClimateEntity."""
-    coordinator_mock = AsyncMock()
+    coordinator_mock = MagicMock()
     coordinator_mock.data = {
         "boil1_actual_high_temperature": 60,
         "boil1_target_high_temperature": 65,
     }
     
-    entry_mock = MagicMock(spec=ConfigEntry)
+    entry_mock = MagicMock(spec=MockConfigEntry)
     entry_mock.entry_id = "test_entry"
     entry_mock.data = {"name": "test"}
     entry_mock.options = {}
@@ -98,19 +99,19 @@ async def test_lambda_climate_entity_properties():
 @pytest.mark.asyncio
 async def test_lambda_climate_entity_set_temperature():
     """Test set temperature method of LambdaClimateEntity."""
-    coordinator_mock = AsyncMock()
+    coordinator_mock = MagicMock()
     coordinator_mock.data = {}
     coordinator_mock.client = MagicMock()
     coordinator_mock.client.write_register = MagicMock(return_value=MagicMock(isError=lambda: False))
-    coordinator_mock.async_refresh = AsyncMock()
+    coordinator_mock.async_refresh = MagicMock()
     
-    entry_mock = MagicMock(spec=ConfigEntry)
+    entry_mock = MagicMock(spec=MockConfigEntry)
     entry_mock.entry_id = "test_entry"
     entry_mock.data = {"name": "test", "slave_id": 1}
     entry_mock.options = {}
     
     hass_mock = MagicMock()
-    hass_mock.async_add_executor_job = AsyncMock(return_value=MagicMock(isError=lambda: False))
+    hass_mock.async_add_executor_job = MagicMock(return_value=MagicMock(isError=lambda: False))
     
     climate_type = "hot_water_1"
     translation_key = "hot_water"
@@ -152,10 +153,10 @@ async def test_lambda_climate_entity_set_temperature():
 @pytest.mark.asyncio
 async def test_lambda_climate_entity_device_info():
     """Test device info method of LambdaClimateEntity."""
-    coordinator_mock = AsyncMock()
+    coordinator_mock = MagicMock()
     coordinator_mock.data = {}
     
-    entry_mock = MagicMock(spec=ConfigEntry)
+    entry_mock = MagicMock(spec=MockConfigEntry)
     entry_mock.entry_id = "test_entry"
     entry_mock.data = {"name": "test"}
     entry_mock.options = {}
