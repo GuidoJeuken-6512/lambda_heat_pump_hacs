@@ -232,17 +232,17 @@ class LambdaClimateEntity(CoordinatorEntity, ClimateEntity):
         name_prefix = entry.data.get("name", "lambda").lower().replace(" ", "")
         # Name und unique_id nach Schema
         if climate_type.startswith("hot_water"):
-            idx = climate_type.split("_")[-1]
-            self._attr_name = f"{name_prefix.upper()} Boil{idx}"
-            self._attr_unique_id = f"{name_prefix}_boil{idx}_climate"
-            self.entity_id = f"climate.{name_prefix}_boil{idx}_climate"
+            self._attr_name = f"{name_prefix}_hot_water"
+            self._attr_unique_id = f"{name_prefix}_hot_water_climate"
+            self.entity_id = f"climate.{name_prefix}_hot_water_climate"
             # Get operating state sensor ID for boiler
+            idx = climate_type.split("_")[-1]
             self._operating_state_sensor = f"boil{idx}_operating_state"
         elif climate_type.startswith("heating_circuit"):
             idx = climate_type.split("_")[-1]
-            self._attr_name = f"{name_prefix.upper()} HC {idx}"
-            self._attr_unique_id = f"{name_prefix}_hc{idx}_climate"
-            self.entity_id = f"climate.{name_prefix}_hc{idx}_climate"
+            self._attr_name = f"{name_prefix}_heating_circuit_{idx}"
+            self._attr_unique_id = f"{name_prefix}_heating_circuit_{idx}_climate"
+            self.entity_id = f"climate.{name_prefix}_heating_circuit_{idx}_climate"
             # Get operating state sensor ID for heating circuit
             self._operating_state_sensor = f"hc{idx}_operating_state"
         else:
@@ -309,24 +309,42 @@ class LambdaClimateEntity(CoordinatorEntity, ClimateEntity):
     @property
     def device_info(self):
         """Return device information."""
-        # Use the shared utility for device info
+        name_prefix = self._entry.data.get("name", "lambda").lower().replace(" ", "")
         if self._climate_type.startswith("hot_water"):
             idx = self._climate_type.split("_")[-1]
-            return build_device_info(self._entry, "boiler", idx)
+            device_id = f"{name_prefix}_hot_water_{idx}"
+            return {
+                "identifiers": {(DOMAIN, device_id)},
+                "name": f"Hot Water {idx}",
+                "manufacturer": "Lambda",
+                "model": self._entry.data.get("firmware_version", "unknown"),
+                "via_device": (DOMAIN, self._entry.entry_id),
+            }
         if self._climate_type.startswith("heating_circuit"):
             idx = self._climate_type.split("_")[-1]
-            return build_device_info(self._entry, "heating_circuit", idx)
+            device_id = f"{name_prefix}_heating_circuit_{idx}"
+            return {
+                "identifiers": {(DOMAIN, device_id)},
+                "name": f"Heating Circuit {idx}",
+                "manufacturer": "Lambda",
+                "model": self._entry.data.get("firmware_version", "unknown"),
+                "via_device": (DOMAIN, self._entry.entry_id),
+            }
         # Fallback: main device
-        return build_device_info(self._entry, "main")
+        return {
+            "identifiers": {(DOMAIN, self._entry.entry_id)},
+            "name": self._entry.data.get("name", "Lambda WP"),
+            "manufacturer": "Lambda",
+            "model": self._entry.data.get("firmware_version", "unknown"),
+        }
 
     async def async_set_temperature(self, **kwargs: Any) -> None:
         """Set new target temperature."""
-        # kwargs is used, no change needed
         if (temperature := kwargs.get(ATTR_TEMPERATURE)) is None:
             return
 
         try:
-            # Dynamische Boiler-Sensoren unterstützen
+            # Hole die Sensor-Information
             sensor_info = None
             if self._target_temp_sensor.startswith("boil"):
                 parts = self._target_temp_sensor.split("_", 1)
@@ -348,29 +366,36 @@ class LambdaClimateEntity(CoordinatorEntity, ClimateEntity):
                     )
             else:
                 sensor_info = SENSOR_TYPES.get(self._target_temp_sensor)
+
             if not sensor_info:
                 _LOGGER.error(
                     "No sensor definition found for %s",
                     self._target_temp_sensor,
                 )
                 return
+
             # Berechne den Rohwert für das Register
             raw_value = int(temperature / sensor_info["scale"])
+
             # Schreibe den Wert in das Modbus-Register
             result = await self.hass.async_add_executor_job(
-                self.coordinator.client.write_registers,
+                self.coordinator.client.write_register,
                 sensor_info["address"],
-                [raw_value],
-                self._entry.data.get("slave_id", 1),
+                raw_value,
+                self._entry.data.get("slave_id", 1)
             )
-            if result.isError():
+
+            if hasattr(result, "isError") and result.isError():
                 _LOGGER.error(
                     "Failed to write target temperature: %s",
                     result,
                 )
                 return
+
             # Aktualisiere den Coordinator-Cache
             self.coordinator.data[self._target_temp_sensor] = temperature
+            # Aktualisiere die Daten
+            await self.coordinator.async_refresh()
             self.async_write_ha_state()
             _LOGGER.debug(
                 "Successfully set target temperature to %s°C",

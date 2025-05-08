@@ -49,6 +49,8 @@ async def test_async_setup_entry(mock_hass: HomeAssistant, mock_config_entry):
         coordinator.async_refresh = AsyncMock()
         mock_coordinator.return_value = coordinator
         
+        mock_hass.services = MagicMock()
+        
         result = await async_setup_entry(mock_hass, mock_config_entry)
         assert result is True
         
@@ -62,6 +64,9 @@ async def test_async_unload_entry(mock_hass: HomeAssistant, mock_config_entry):
     coordinator_mock = AsyncMock()
     coordinator_mock.client = MagicMock()
     coordinator_mock.client.close = MagicMock()
+    
+    # Patch für Home Assistant Services-Mock
+    mock_hass.services = MagicMock()
     
     mock_hass.data = {
         DOMAIN: {

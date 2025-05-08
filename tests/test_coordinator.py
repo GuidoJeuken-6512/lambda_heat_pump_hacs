@@ -26,7 +26,7 @@ class TestCoordinator(unittest.TestCase):
         mock_api_instance.get_data.assert_called_once()
 
     def test_coordinator_initialization(self):
-        with patch("lambda_heat_pumps.coordinator.DataUpdateCoordinator") as mock_coordinator:
+        with patch("custom_components.lambda_heat_pumps.coordinator.DataUpdateCoordinator") as mock_coordinator:
             mock_coordinator.return_value = AsyncMock()
             mock_entry = MagicMock()
             mock_entry.options = {"update_interval": 30}

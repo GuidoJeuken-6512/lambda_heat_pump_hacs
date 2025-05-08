@@ -100,13 +100,17 @@ async def test_lambda_climate_entity_set_temperature():
     """Test set temperature method of LambdaClimateEntity."""
     coordinator_mock = AsyncMock()
     coordinator_mock.data = {}
-    coordinator_mock.async_write_register = AsyncMock()
+    coordinator_mock.client = MagicMock()
+    coordinator_mock.client.write_register = MagicMock(return_value=MagicMock(isError=lambda: False))
     coordinator_mock.async_refresh = AsyncMock()
     
     entry_mock = MagicMock(spec=ConfigEntry)
     entry_mock.entry_id = "test_entry"
     entry_mock.data = {"name": "test", "slave_id": 1}
     entry_mock.options = {}
+    
+    hass_mock = MagicMock()
+    hass_mock.async_add_executor_job = AsyncMock(return_value=MagicMock(isError=lambda: False))
     
     climate_type = "hot_water_1"
     translation_key = "hot_water"
@@ -127,11 +131,22 @@ async def test_lambda_climate_entity_set_temperature():
         max_temp=max_temp,
         temp_step=temp_step,
     )
+    entity.hass = hass_mock
     
     await entity.async_set_temperature(temperature=60)
-    coordinator_mock.async_write_register.assert_called_once_with(
-        target_temp_sensor, 60
-    )
+    
+    # Überprüfe, ob async_add_executor_job mit den korrekten Parametern aufgerufen wurde
+    hass_mock.async_add_executor_job.assert_called_once()
+    call_args = hass_mock.async_add_executor_job.call_args[0]
+    assert call_args[0] == coordinator_mock.client.write_register
+    assert call_args[1] == 2050  # BOIL_BASE_ADDRESS[1] + relative_address von target_high_temperature
+    assert call_args[2] == 600  # Temperatur * scale (10.0)
+    assert call_args[3] == 1  # slave_id
+    
+    # Überprüfe, ob der Coordinator-Cache aktualisiert wurde
+    assert coordinator_mock.data[target_temp_sensor] == 60
+    
+    # Überprüfe, ob async_refresh aufgerufen wurde
     coordinator_mock.async_refresh.assert_called_once()
 
 @pytest.mark.asyncio
@@ -167,4 +182,4 @@ async def test_lambda_climate_entity_device_info():
     
     device_info = entity.device_info
     assert device_info is not None
-    assert device_info["identifiers"] == {("lambda_heat_pumps", "test_hot_water")}
+    assert device_info["identifiers"] == {("lambda_heat_pumps", "test_hot_water_1")}

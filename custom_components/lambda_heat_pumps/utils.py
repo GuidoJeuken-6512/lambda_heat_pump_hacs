@@ -1,3 +1,6 @@
+"""Utility functions for Lambda Heat Pumps integration."""
+import logging
+
 def get_compatible_sensors(sensor_templates: dict, fw_version: int) -> dict:
     """Return only sensors compatible with the given firmware version.
      Args:
@@ -11,6 +14,12 @@ def get_compatible_sensors(sensor_templates: dict, fw_version: int) -> dict:
         for k, v in sensor_templates.items()
         if v.get("firmware_version", 1) <= fw_version
     }
+
+
+def setup_debug_logging():
+    """Set up debug logging for the integration."""
+    logger = logging.getLogger("custom_components.lambda_heat_pumps")
+    logger.setLevel(logging.DEBUG)
 
 
 def build_device_info(entry, device_type, idx=None, sensor_id=None):
