@@ -19,14 +19,8 @@ Diese benutzerdefinierte Integration ermöglicht die Einbindung von Lambda Wärm
 - Konfiguration vollständig über die Home Assistant UI (Integrations)
 
 **Installation:**
-1. Kopieren Sie den gesamten Ordner `lambda` in Ihren `custom_components` Ordner innerhalb Ihres Home Assistant Konfigurationsverzeichnisses.
-Die Ordner
-- .cursor
-- .github
-- .vscode
-können gelöscht werden. Sie sind für die Weiterentwicklung hilfreich.
-Der Ordner "docs" enthält die Dokumentation, er kann auch gelöscht werden.
-Alle nicht benötigten Ordner stören die Integration aber nicht.
+1. Kopieren Sie den gesamten Ordner `custom_components/lambda_heat_pumps` in Ihren `custom_components` Ordner innerhalb Ihres Home Assistant Konfigurationsverzeichnisses.
+Der Ordner "docs" enthält die Dokumentation, er muss nicht auf das Home Assistant System übernommen werden. Er enthällt weietrführende Dokumentation.
 
 2. Starten Sie Home Assistant neu.
 
@@ -86,13 +80,8 @@ This custom integration allows you to connect Lambda heat pumps to Home Assistan
 
 **Installation:**
 1. Copy the entire `lambda` folder into your `custom_components` directory inside your Home Assistant configuration folder.
-The folders
-- .cursor
-- .github
-- .vscode
-can be deleted. They are helpful for further development.
-The "docs" folder contains the documentation and can also be deleted.
 However, all folders that are not required do not interfere with the integration.
+
 2. Restart Home Assistant.
 A more detailed description of the installation and configuration can be found here: https://homeassistant.com.de/homeassistant/lambda-waermepumpe-integration-fuer-home-assistant/
 
