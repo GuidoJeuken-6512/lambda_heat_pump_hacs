@@ -134,19 +134,12 @@ async def async_setup_services(hass: HomeAssistant) -> None:
 
                 try:
                     temperature = float(state.state)
-
-                    # Berechne Rohwert (Temperatur * 10)
                     raw_value = int(temperature * 10)
+                    # Registeradresse: 5004, 5104, 5204, ...
+                    register_address = 5004 + (hc_idx - 1) * 100
 
-                    # Berechne die korrekte Modbus-Register-Adresse für diesen Heizkreis
-                    register_address = (
-                        HC_BASE_ADDRESS[hc_idx] + ROOM_TEMPERATURE_REGISTER_OFFSET
-                    )
-
-                    # Debug-Eintrag anstatt tatsächlich ins Modbus-Register zu schreiben
                     _LOGGER.info(
-                        "Simuliere Modbus write auf Register %s mit Wert %s "
-                        "(Temperatur: %s°C) für Heizkreis %s, entry_id %s",
+                        "[Service] Schreibe Modbus-Register %s mit Wert %s (Temperatur: %s°C) für Heizkreis %s, entry_id %s",
                         register_address,
                         raw_value,
                         temperature,
@@ -154,8 +147,6 @@ async def async_setup_services(hass: HomeAssistant) -> None:
                         entry_id,
                     )
 
-                    # Kein tatsächlicher Modbus-Schreibvorgang! Ab hier auskommentieren,
-                    # wenn Modbus-Schreibvorgang deaktiviert werden soll.
                     result = await hass.async_add_executor_job(
                         coordinator.client.write_registers,
                         register_address,

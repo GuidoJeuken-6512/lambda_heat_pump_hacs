@@ -79,8 +79,7 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         coordinator = hass.data[DOMAIN][entry.entry_id].get("coordinator")
         if coordinator and getattr(coordinator, "client", None):
             await hass.async_add_executor_job(coordinator.client.close)
-        hass.data[DOMAIN].pop(entry.entry_id)
-
+        hass.data[DOMAIN].pop(entry.entry_id, None)  # robust gegen KeyError
         # Wenn dies der letzte Entry war, entferne auch die Services
         if not hass.data[DOMAIN]:
             await async_unload_services(hass)

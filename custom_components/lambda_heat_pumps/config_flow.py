@@ -279,13 +279,8 @@ class LambdaConfigFlow(ConfigFlow, domain=DOMAIN):
             else:
                 # Erstelle den Eintrag mit Standard-Optionen
                 default_options = {
-                    "room_thermostat_control": user_input.get(
-                        "room_thermostat_control",
-                        existing_options.get(
-                            "room_thermostat_control",
-                            DEFAULT_ROOM_THERMOSTAT_CONTROL
-                        ),
-                    ),
+                    # Immer false beim initialen Setup
+                    "room_thermostat_control": False,
                     "hot_water_min_temp": user_input.get(
                         "hot_water_min_temp",
                         existing_options.get(
@@ -452,6 +447,17 @@ class LambdaOptionsFlow(OptionsFlow):
                             self._options
                         )
                         return await self.async_step_room_sensor()
+                    else:
+                        # Wenn room_thermostat_control deaktiviert wurde,
+                        # entferne alle Temperatursensoren aus den Optionen
+                        num_hc = self._config_entry.data.get("num_hc", 1)
+                        for hc_idx in range(1, num_hc + 1):
+                            entity_key = CONF_ROOM_TEMPERATURE_ENTITY.format(hc_idx)
+                            if entity_key in self._options:
+                                del self._options[entity_key]
+                        _LOGGER.debug(
+                            "Room thermostat control disabled, removed temperature sensors from options"
+                        )
 
                     # Update options with new values
                     updated_options = dict(self._options)
@@ -628,12 +634,25 @@ class LambdaOptionsFlow(OptionsFlow):
 
         if user_input is not None:
             try:
+                # Prüfe, ob mindestens ein Sensor ausgewählt wurde
+                has_selected_sensor = False
                 for hc_idx in range(1, num_hc + 1):
                     entity_key = CONF_ROOM_TEMPERATURE_ENTITY.format(hc_idx)
                     if entity_key in user_input and user_input[entity_key]:
                         self._options[entity_key] = user_input[entity_key]
+                        has_selected_sensor = True
                     elif entity_key in self._options:
                         del self._options[entity_key]
+
+                # Setze room_thermostat_control basierend auf der Sensorauswahl
+                self._options["room_thermostat_control"] = has_selected_sensor
+                _LOGGER.debug(
+                    "Room sensor selection completed. Has selected sensor: %s, "
+                    "room_thermostat_control set to: %s",
+                    has_selected_sensor,
+                    self._options["room_thermostat_control"]
+                )
+
                 return self.async_create_entry(title="", data=self._options)
             except Exception:
                 _LOGGER.exception(
@@ -661,6 +680,8 @@ class LambdaOptionsFlow(OptionsFlow):
 
         if not temp_entities:
             errors["base"] = "no_temp_sensors"
+            # Setze room_thermostat_control auf false, da keine Sensoren verfügbar sind
+            self._options["room_thermostat_control"] = False
             return self.async_show_form(step_id="room_sensor", errors=errors)
 
         # Sortiere nach Friendly Name

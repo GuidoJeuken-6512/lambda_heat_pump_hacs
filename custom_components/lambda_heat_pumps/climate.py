@@ -129,6 +129,7 @@ async def async_setup_entry(
     entities = []
 
     # Dynamische Hot Water Entities für alle Boiler
+    # Diese werden immer erstellt, unabhängig von room_thermostat_control
     num_boil = entry.data.get("num_boil", 1)
     for boil_idx in range(1, num_boil + 1):
         hw_current_temp_sensor = (
@@ -169,47 +170,52 @@ async def async_setup_entry(
             entities.append(LambdaClimateEntity(**kwargs))
 
     # Dynamische Heating Circuit Entities für alle Heizkreise
-    num_hc = entry.data.get("num_hc", 1)
-    for hc_idx in range(1, num_hc + 1):
-        hc_current_temp_sensor = (
-            f"hc{hc_idx}_room_device_temperature"
-        )
-        hc_target_temp_sensor = (
-            f"hc{hc_idx}_target_room_temperature"
-        )
-        if (
-            is_sensor_compatible(hc_current_temp_sensor)
-            and is_sensor_compatible(hc_target_temp_sensor)
-        ):
-            if num_hc == 1:
-                translation_key = "heating_circuit"
-                translation_placeholders = None
-            else:
-                translation_key = "heating_circuit_numbered"
-                translation_placeholders = {"number": hc_idx}
-            kwargs = dict(
-                coordinator=coordinator,
-                entry=entry,
-                climate_type=f"heating_circuit_{hc_idx}",
-                translation_key=translation_key,
-                current_temp_sensor=hc_current_temp_sensor,
-                target_temp_sensor=hc_target_temp_sensor,
-                min_temp=options.get(
-                    "heating_circuit_min_temp",
-                    DEFAULT_HEATING_CIRCUIT_MIN_TEMP,
-                ),
-                max_temp=options.get(
-                    "heating_circuit_max_temp",
-                    DEFAULT_HEATING_CIRCUIT_MAX_TEMP,
-                ),
-                temp_step=options.get(
-                    "heating_circuit_temp_step",
-                    DEFAULT_HEATING_CIRCUIT_TEMP_STEP,
-                ),
+    # Nur erzeugen wenn room_thermostat_control aktiv ist
+    room_thermostat_control = entry.options.get("room_thermostat_control", False)
+    if room_thermostat_control:
+        num_hc = entry.data.get("num_hc", 1)
+        for hc_idx in range(1, num_hc + 1):
+            hc_current_temp_sensor = (
+                f"hc{hc_idx}_room_device_temperature"
             )
-            if translation_placeholders is not None:
-                kwargs["translation_placeholders"] = translation_placeholders
-            entities.append(LambdaClimateEntity(**kwargs))
+            hc_target_temp_sensor = (
+                f"hc{hc_idx}_target_room_temperature"
+            )
+            if (
+                is_sensor_compatible(hc_current_temp_sensor)
+                and is_sensor_compatible(hc_target_temp_sensor)
+            ):
+                if num_hc == 1:
+                    translation_key = "heating_circuit"
+                    translation_placeholders = None
+                else:
+                    translation_key = "heating_circuit_numbered"
+                    translation_placeholders = {"number": hc_idx}
+                kwargs = dict(
+                    coordinator=coordinator,
+                    entry=entry,
+                    climate_type=f"heating_circuit_{hc_idx}",
+                    translation_key=translation_key,
+                    current_temp_sensor=hc_current_temp_sensor,
+                    target_temp_sensor=hc_target_temp_sensor,
+                    min_temp=options.get(
+                        "heating_circuit_min_temp",
+                        DEFAULT_HEATING_CIRCUIT_MIN_TEMP,
+                    ),
+                    max_temp=options.get(
+                        "heating_circuit_max_temp",
+                        DEFAULT_HEATING_CIRCUIT_MAX_TEMP,
+                    ),
+                    temp_step=options.get(
+                        "heating_circuit_temp_step",
+                        DEFAULT_HEATING_CIRCUIT_TEMP_STEP,
+                    ),
+                )
+                if translation_placeholders is not None:
+                    kwargs["translation_placeholders"] = translation_placeholders
+                entities.append(LambdaClimateEntity(**kwargs))
+    else:
+        _LOGGER.debug("Room thermostat control is disabled, skipping heating circuit climate entities")
 
     async_add_entities(entities)
 
