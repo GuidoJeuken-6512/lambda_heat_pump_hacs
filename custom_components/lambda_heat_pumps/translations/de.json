@@ -54,7 +54,9 @@
   },
   "climate": {
     "hot_water": "Warmwasser",
+    "hot_water_numbered": "Warmwasser {number}",
     "heating_circuit": "Heizkreis",
+    "heating_circuit_numbered": "Heizkreis {number}",
     "current_temperature": "Aktuelle Temperatur",
     "target_temperature": "Soll-Temperatur",
     "min_temp": "Minimale Temperatur",

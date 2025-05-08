@@ -141,25 +141,32 @@ async def async_setup_entry(
             is_sensor_compatible(hw_current_temp_sensor)
             and is_sensor_compatible(hw_target_temp_sensor)
         ):
-            entities.append(
-                LambdaClimateEntity(
-                    coordinator=coordinator,
-                    entry=entry,
-                    climate_type=f"hot_water_{boil_idx}",
-                    translation_key="hot_water",
-                    current_temp_sensor=hw_current_temp_sensor,
-                    target_temp_sensor=hw_target_temp_sensor,
-                    min_temp=options.get(
-                        "hot_water_min_temp",
-                        DEFAULT_HOT_WATER_MIN_TEMP,
-                    ),
-                    max_temp=options.get(
-                        "hot_water_max_temp",
-                        DEFAULT_HOT_WATER_MAX_TEMP,
-                    ),
-                    temp_step=1,
-                )
+            if num_boil == 1:
+                translation_key = "hot_water"
+                translation_placeholders = None
+            else:
+                translation_key = "hot_water_numbered"
+                translation_placeholders = {"number": boil_idx}
+            kwargs = dict(
+                coordinator=coordinator,
+                entry=entry,
+                climate_type=f"hot_water_{boil_idx}",
+                translation_key=translation_key,
+                current_temp_sensor=hw_current_temp_sensor,
+                target_temp_sensor=hw_target_temp_sensor,
+                min_temp=options.get(
+                    "hot_water_min_temp",
+                    DEFAULT_HOT_WATER_MIN_TEMP,
+                ),
+                max_temp=options.get(
+                    "hot_water_max_temp",
+                    DEFAULT_HOT_WATER_MAX_TEMP,
+                ),
+                temp_step=1,
             )
+            if translation_placeholders is not None:
+                kwargs["translation_placeholders"] = translation_placeholders
+            entities.append(LambdaClimateEntity(**kwargs))
 
     # Dynamische Heating Circuit Entities für alle Heizkreise
     num_hc = entry.data.get("num_hc", 1)
@@ -174,28 +181,35 @@ async def async_setup_entry(
             is_sensor_compatible(hc_current_temp_sensor)
             and is_sensor_compatible(hc_target_temp_sensor)
         ):
-            entities.append(
-                LambdaClimateEntity(
-                    coordinator=coordinator,
-                    entry=entry,
-                    climate_type=f"heating_circuit_{hc_idx}",
-                    translation_key="heating_circuit",
-                    current_temp_sensor=hc_current_temp_sensor,
-                    target_temp_sensor=hc_target_temp_sensor,
-                    min_temp=options.get(
-                        "heating_circuit_min_temp",
-                        DEFAULT_HEATING_CIRCUIT_MIN_TEMP,
-                    ),
-                    max_temp=options.get(
-                        "heating_circuit_max_temp",
-                        DEFAULT_HEATING_CIRCUIT_MAX_TEMP,
-                    ),
-                    temp_step=options.get(
-                        "heating_circuit_temp_step",
-                        DEFAULT_HEATING_CIRCUIT_TEMP_STEP,
-                    ),
-                )
+            if num_hc == 1:
+                translation_key = "heating_circuit"
+                translation_placeholders = None
+            else:
+                translation_key = "heating_circuit_numbered"
+                translation_placeholders = {"number": hc_idx}
+            kwargs = dict(
+                coordinator=coordinator,
+                entry=entry,
+                climate_type=f"heating_circuit_{hc_idx}",
+                translation_key=translation_key,
+                current_temp_sensor=hc_current_temp_sensor,
+                target_temp_sensor=hc_target_temp_sensor,
+                min_temp=options.get(
+                    "heating_circuit_min_temp",
+                    DEFAULT_HEATING_CIRCUIT_MIN_TEMP,
+                ),
+                max_temp=options.get(
+                    "heating_circuit_max_temp",
+                    DEFAULT_HEATING_CIRCUIT_MAX_TEMP,
+                ),
+                temp_step=options.get(
+                    "heating_circuit_temp_step",
+                    DEFAULT_HEATING_CIRCUIT_TEMP_STEP,
+                ),
             )
+            if translation_placeholders is not None:
+                kwargs["translation_placeholders"] = translation_placeholders
+            entities.append(LambdaClimateEntity(**kwargs))
 
     async_add_entities(entities)
 
@@ -222,6 +236,7 @@ class LambdaClimateEntity(CoordinatorEntity, ClimateEntity):
         min_temp: float,
         max_temp: float,
         temp_step: float,
+        translation_placeholders: dict = None,
     ) -> None:
         """Initialize the climate entity."""
         super().__init__(coordinator)
@@ -229,24 +244,21 @@ class LambdaClimateEntity(CoordinatorEntity, ClimateEntity):
         self._climate_type = climate_type
         self._current_temp_sensor = current_temp_sensor
         self._target_temp_sensor = target_temp_sensor
+        self._attr_translation_key = translation_key
+        self._attr_translation_placeholders = translation_placeholders or {}
+        # unique_id und entity_id wie gehabt
         name_prefix = entry.data.get("name", "lambda").lower().replace(" ", "")
-        # Name und unique_id nach Schema
         if climate_type.startswith("hot_water"):
-            self._attr_name = f"{name_prefix}_hot_water"
-            self._attr_unique_id = f"{name_prefix}_hot_water_climate"
-            self.entity_id = f"climate.{name_prefix}_hot_water_climate"
-            # Get operating state sensor ID for boiler
             idx = climate_type.split("_")[-1]
+            self._attr_unique_id = f"{name_prefix}_hot_water_{idx}_climate"
+            self.entity_id = f"climate.{name_prefix}_hot_water_{idx}_climate"
             self._operating_state_sensor = f"boil{idx}_operating_state"
         elif climate_type.startswith("heating_circuit"):
             idx = climate_type.split("_")[-1]
-            self._attr_name = f"{name_prefix}_heating_circuit_{idx}"
             self._attr_unique_id = f"{name_prefix}_heating_circuit_{idx}_climate"
             self.entity_id = f"climate.{name_prefix}_heating_circuit_{idx}_climate"
-            # Get operating state sensor ID for heating circuit
             self._operating_state_sensor = f"hc{idx}_operating_state"
         else:
-            self._attr_name = climate_type.capitalize()
             self._attr_unique_id = f"{name_prefix}_{climate_type}_climate"
             self.entity_id = f"climate.{name_prefix}_{climate_type}_climate"
             self._operating_state_sensor = None
@@ -309,34 +321,14 @@ class LambdaClimateEntity(CoordinatorEntity, ClimateEntity):
     @property
     def device_info(self):
         """Return device information."""
-        name_prefix = self._entry.data.get("name", "lambda").lower().replace(" ", "")
         if self._climate_type.startswith("hot_water"):
             idx = self._climate_type.split("_")[-1]
-            device_id = f"{name_prefix}_hot_water_{idx}"
-            return {
-                "identifiers": {(DOMAIN, device_id)},
-                "name": f"Hot Water {idx}",
-                "manufacturer": "Lambda",
-                "model": self._entry.data.get("firmware_version", "unknown"),
-                "via_device": (DOMAIN, self._entry.entry_id),
-            }
+            return build_device_info(self._entry, "hot_water_climate", idx)
         if self._climate_type.startswith("heating_circuit"):
             idx = self._climate_type.split("_")[-1]
-            device_id = f"{name_prefix}_heating_circuit_{idx}"
-            return {
-                "identifiers": {(DOMAIN, device_id)},
-                "name": f"Heating Circuit {idx}",
-                "manufacturer": "Lambda",
-                "model": self._entry.data.get("firmware_version", "unknown"),
-                "via_device": (DOMAIN, self._entry.entry_id),
-            }
+            return build_device_info(self._entry, "heating_circuit_climate", idx)
         # Fallback: main device
-        return {
-            "identifiers": {(DOMAIN, self._entry.entry_id)},
-            "name": self._entry.data.get("name", "Lambda WP"),
-            "manufacturer": "Lambda",
-            "model": self._entry.data.get("firmware_version", "unknown"),
-        }
+        return build_device_info(self._entry, "main")
 
     async def async_set_temperature(self, **kwargs: Any) -> None:
         """Set new target temperature."""

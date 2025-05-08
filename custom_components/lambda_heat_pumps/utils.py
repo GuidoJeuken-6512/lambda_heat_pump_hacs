@@ -23,10 +23,20 @@ def setup_debug_logging():
 
 
 def build_device_info(entry, device_type, idx=None, sensor_id=None):
-    # sensor_id argument is unused, kept for interface compatibility
+    """
+    Build device_info dict for Home Assistant device registry.
+    device_type: 'main', 'heat_pump', 'boiler', 'heating_circuit', 'buffer', 'solar',
+                 oder für Climate-Entities: 'hot_water_climate', 'heating_circuit_climate' (werden intern gemappt)
+    idx: Nummer des Subgeräts (z. B. 1, 2, ...)
+    """
     DOMAIN = entry.domain if hasattr(entry, 'domain') else 'lambda_heat_pumps'
     entry_id = entry.entry_id
     fw_version = entry.data.get("firmware_version", "unknown")
+    # Climate-Entity-Typen auf Subgeräte mappen
+    if device_type == "hot_water_climate":
+        device_type = "boiler"
+    if device_type == "heating_circuit_climate":
+        device_type = "heating_circuit"
     if device_type == "main":
         host = entry.data.get("host")
         return {

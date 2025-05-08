@@ -54,7 +54,9 @@
   },
   "climate": {
     "hot_water": "Hot Water",
+    "hot_water_numbered": "Hot Water {number}",
     "heating_circuit": "Heating Circuit",
+    "heating_circuit_numbered": "Heating Circuit {number}",
     "current_temperature": "Current Temperature",
     "target_temperature": "Target Temperature",
     "min_temp": "Minimum Temperature",

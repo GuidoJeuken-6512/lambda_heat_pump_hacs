@@ -20,6 +20,7 @@ Diese benutzerdefinierte Integration ermöglicht die Einbindung von Lambda Wärm
 
 **Installation:**
 1. Kopieren Sie den gesamten Ordner `custom_components/lambda_heat_pumps` in Ihren `custom_components` Ordner innerhalb Ihres Home Assistant Konfigurationsverzeichnisses.
+Alle anderen Ordner müssen  nicht übernommen werden.
 Der Ordner "docs" enthält die Dokumentation, er muss nicht auf das Home Assistant System übernommen werden. Er enthällt weietrführende Dokumentation.
 
 2. Starten Sie Home Assistant neu.
@@ -45,17 +46,18 @@ Eine weitergehende Beschreibung der Installation und Konfiguration ist hier zu f
 - Initialwerte für Sensoren (z.B. Dummy) können in const.py gesetzt werden
 
 **Hinweise für Home Assistant 2025.3:**
-- Diese Integration ist vollständig kompatibel mit Home Assistant 2025.3
+- Diese Integration ist vollständig kompatibel mit Home Assistant 2025.3 ff
 - Verwendet den neuen DataUpdateCoordinator für optimale Leistung
 - Typisierung und async/await nach den neuesten Standards
 - Verbesserte Fehlerbehandlung und Logging
 - Moderne Konfigurations- und Options-Flows
 
 **Debugging:**
-- Beim Speichern der Konfiguration und Optionen werden die geschriebenen Werte im Home Assistant Log (DEBUG) ausgegeben
+- Im Debug-Mode werden die geschriebenen Werte im Home Assistant Log (DEBUG) ausgegeben
 
 **Bekannte Probleme:**
 - Die Übersetzung in andere Sprachen (außer Deutsch und Englisch)
+- Die Zuordnung von Sensoren zu Firmware-Ständen ist nicht korrekt
 
 **Haftungsausschluss/Disclaimer:**
 
@@ -92,7 +94,7 @@ A more detailed description of the installation and configuration can be found h
 - Optional: Enable room thermostat control to use external temperature sensors for each heating circuit
 - After setup, temperature ranges, firmware version and update interval can be **changed at any time** via the options
 
-**Raumthermostatsteuerung & Modbus-Schreibvorgang (Kurzfassung):**
+**Room thermostat control & Modbus write process (short version):**
 - External temperature sensors can be selected for each heating circuit (dropdown, only non-integration sensors with device_class 'temperature').
 - The integration automatically and regularly writes the measured values to the Modbus registers of the heating circuits.
 - Writing is handled by the service function in `services.py` and can also be triggered manually via a service call.
@@ -103,17 +105,18 @@ A more detailed description of the installation and configuration can be found h
 - Initial values for sensors (e.g. dummy) can be set in const.py
 
 **Notes for Home Assistant 2025.3:**
-- This integration is fully compatible with Home Assistant 2025.3
+- This integration is fully compatible with Home Assistant 2025.3 ff
 - Uses the new DataUpdateCoordinator for optimal performance
 - Typing and async/await according to the latest standards
 - Improved error handling and logging
 - Modern configuration and options flows
 
 **Debugging:**
-- When saving configuration and options, the written values are output to the Home Assistant log (DEBUG)
+- in debug mode the written values are output to the Home Assistant log (DEBUG)
 
 **Known Issues:**
 - Translation to other languages (besides German and English)
+- the assignment of sensors to firmware stands is not correct
 
 ---
 
