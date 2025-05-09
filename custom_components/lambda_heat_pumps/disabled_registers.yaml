@@ -1,0 +1,10 @@
+# Liste der deaktivierten Modbus-Register
+# Diese Register werden nicht abgefragt
+# Format: Liste von Register-Adressen
+# Beispiel:
+# - 1234  # boil1_actual_circulation_temp
+# - 1235  # boil1_actual_circulation_pump_state
+
+disabled_registers:
+  - 2004  # boil1_actual_circulation_temp
+  - 2005  # boil1_actual_circulation_pump_state 

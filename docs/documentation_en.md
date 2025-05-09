@@ -90,6 +90,39 @@ The integration offers room thermostat control, which allows using external temp
 
 The integration allows you to select any external temperature sensor from Home Assistant for each heating circuit (dropdown, only non-integration sensors with device_class 'temperature'). Selection is done in the options flow. The measured values are automatically and regularly (e.g., every minute) written to the Modbus registers of the respective heating circuits. This is handled by the service function `async_update_room_temperature` in `services.py`, which reads, validates, and writes the value for each circuit to the correct register via the Modbus client. Errors are logged. The transmission can also be triggered manually via the `lambda.update_room_temperature` service. Each write operation is logged at debug level. The technical implementation and process are documented in `services.py`.
 
+## Disabled Registers
+
+The integration provides the ability to disable specific Modbus registers that are not present in your specific configuration or cause errors. This is particularly useful when:
+
+- Certain sensors are not present in your heat pump configuration
+- Modbus errors occur for specific registers
+- You want to reduce the number of Modbus requests
+
+### Configuration
+
+1. Enable debug mode in the integration settings
+2. Monitor the logs for Modbus errors
+3. Note the register addresses from the error messages (e.g., "Modbus error for sensor_name (address: 1234)")
+4. Add the addresses to `disabled_registers.yaml`:
+
+```yaml
+disabled_registers:
+  - 1234  # sensor_name
+  - 1235  # another_sensor_name
+```
+
+5. Restart Home Assistant
+
+The disabled registers will no longer be queried, which eliminates error messages and improves performance.
+
+### Technical Details
+
+- Disabled registers are loaded when the integration starts
+- Configuration is stored in a YAML file in the integration directory
+- Register addresses are stored as a set for efficient checking
+- Debug logs show the loaded disabled registers
+- Checking is performed before each Modbus read operation
+
 ## Workflow
 
 1. **Setup (`async_setup_entry` in `__init__.py`)**:

@@ -63,6 +63,31 @@ Eine weitergehende Beschreibung der Installation und Konfiguration ist hier zu f
 
 Die Nutzung dieser Software erfolgt auf eigene Gefahr. Es wird keine Haftung für Schäden, Datenverluste oder sonstige Folgen übernommen, die durch die Verwendung der Software entstehen. Jeglicher Regressanspruch ist ausgeschlossen.
 
+## Deaktivierte Register
+
+Die Integration bietet die Möglichkeit, bestimmte Modbus-Register zu deaktivieren, die in Ihrer spezifischen Konfiguration nicht vorhanden sind oder Fehler verursachen. Dies ist besonders nützlich, wenn:
+
+- Bestimmte Sensoren in Ihrer Wärmepumpen-Konfiguration nicht vorhanden sind
+- Modbus-Fehler für bestimmte Register auftreten
+- Sie die Anzahl der Modbus-Anfragen reduzieren möchten
+
+### Konfiguration
+
+1. Aktivieren Sie den Debug-Modus in den Integrationseinstellungen
+2. Beobachten Sie die Logs für Modbus-Fehler
+3. Notieren Sie die Register-Adressen aus den Fehlermeldungen (z.B. "Modbus error for sensor_name (address: 1234)")
+4. Tragen Sie die Adressen in die `disabled_registers.yaml` ein:
+
+```yaml
+disabled_registers:
+  - 1234  # sensor_name
+  - 1235  # another_sensor_name
+```
+
+5. Starten Sie Home Assistant neu
+
+Die deaktivierten Register werden dann nicht mehr abgefragt, was die Fehlermeldungen beseitigt und die Performance verbessert.
+
 ---
 
 ## English

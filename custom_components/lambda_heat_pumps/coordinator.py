@@ -2,6 +2,8 @@
 from __future__ import annotations
 from datetime import timedelta
 import logging
+import os
+import yaml
 from homeassistant.core import HomeAssistant
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
@@ -51,6 +53,29 @@ class LambdaDataUpdateCoordinator(DataUpdateCoordinator):
             _LOGGER.setLevel(logging.DEBUG)
         self.client = None
         self.config_entry_id = entry.entry_id
+        
+        # Lade deaktivierte Register
+        self.disabled_registers = set()
+        config_path = os.path.join(
+            os.path.dirname(__file__),
+            "disabled_registers.yaml"
+        )
+        if os.path.exists(config_path):
+            try:
+                with open(config_path, 'r') as file:
+                    config = yaml.safe_load(file)
+                    if config and 'disabled_registers' in config:
+                        self.disabled_registers = set(config['disabled_registers'])
+                        _LOGGER.debug(
+                            "Loaded disabled registers: %s",
+                            self.disabled_registers
+                        )
+            except Exception as ex:
+                _LOGGER.error("Error loading disabled registers: %s", ex)
+
+    def is_register_disabled(self, address: int) -> bool:
+        """Check if a register is disabled."""
+        return address in self.disabled_registers
 
     async def _async_update_data(self):
         """Fetch data from Lambda device."""
@@ -77,10 +102,19 @@ class LambdaDataUpdateCoordinator(DataUpdateCoordinator):
             data = {}
             # 1. Statische Sensoren abfragen
             _LOGGER.debug("Starting static sensor block...")
-            static_sensor_count = len(SENSOR_TYPES)
-            _LOGGER.debug("Reading %d static sensors", static_sensor_count)
+            compatible_static_sensors = get_compatible_sensors(SENSOR_TYPES, fw_version)
+            _LOGGER.debug("Reading %d compatible static sensors", len(compatible_static_sensors))
             try:
-                for sensor_id, sensor_config in SENSOR_TYPES.items():
+                for sensor_id, sensor_config in compatible_static_sensors.items():
+                    # Prüfe ob das Register deaktiviert ist
+                    if self.is_register_disabled(sensor_config["address"]):
+                        _LOGGER.debug(
+                            "Skipping disabled register %d for sensor %s",
+                            sensor_config["address"],
+                            sensor_id
+                        )
+                        continue
+                        
                     _LOGGER.debug(
                         "Reading static sensor: %s with address: %d",
                         sensor_id,
@@ -94,7 +128,11 @@ class LambdaDataUpdateCoordinator(DataUpdateCoordinator):
                         self.slave_id,
                     )
                     if result.isError():
-                        _LOGGER.warning(f"Modbus error for {sensor_id}")
+                        _LOGGER.warning(
+                            "Modbus error for %s (address: %d)",
+                            sensor_id,
+                            sensor_config["address"]
+                        )
                         continue
                     if sensor_config["data_type"] == "int32":
                         raw_value = (result.registers[0] << 16) | result.registers[1]
@@ -111,24 +149,29 @@ class LambdaDataUpdateCoordinator(DataUpdateCoordinator):
                 HP_SENSOR_TEMPLATES, fw_version
             )
             for hp_idx in range(1, num_hps + 1):
-                _LOGGER.debug("Reading sensors for HP %s", hp_idx)
+                _LOGGER.debug("Reading sensors for Heat Pump %s", hp_idx)
                 for template_key, template in compatible_hp_templates.items():
-                    _LOGGER.debug("HP %s, template_key: %s", hp_idx, template_key)
                     sensor_id = f"hp{hp_idx}_{template_key}"
                     address = HP_BASE_ADDRESS.get(hp_idx)
                     if address is None:
-                        _LOGGER.warning("No base address for HP %s", hp_idx)
+                        _LOGGER.warning("No base address for Heat Pump %s", hp_idx)
                         continue
-                    address += HP_SENSOR_TEMPLATES[template_key]["relative_address"]
-                    count = (
-                        2
-                        if HP_SENSOR_TEMPLATES[template_key]["data_type"] == "int32"
-                        else 1
-                    )
+                    address += template["relative_address"]
+                    
+                    # Prüfe ob das Register deaktiviert ist
+                    if self.is_register_disabled(address):
+                        _LOGGER.debug(
+                            "Skipping disabled register %d for sensor %s",
+                            address,
+                            sensor_id
+                        )
+                        continue
+                        
+                    count = 2 if template["data_type"] == "int32" else 1
                     try:
                         _LOGGER.debug(
-                            "Attempting to read Modbus register for sensor %s at "
-                            "address %d with count %d",
+                            "Attempting to read Modbus register for HP sensor %s "
+                            "at address %d with count %d",
                             sensor_id,
                             address,
                             count,
@@ -140,23 +183,17 @@ class LambdaDataUpdateCoordinator(DataUpdateCoordinator):
                             self.slave_id,
                         )
                         if result.isError():
-                            _LOGGER.warning(f"Modbus error for {sensor_id}")
+                            _LOGGER.warning(
+                                "Modbus error for %s (address: %d)",
+                                sensor_id,
+                                address
+                            )
                             continue
-                        if HP_SENSOR_TEMPLATES[template_key]["data_type"] == "int32":
-                            raw_value = (result.registers[0] << 16) | result.registers[
-                                1
-                            ]
+                        if template["data_type"] == "int32":
+                            raw_value = (result.registers[0] << 16) | result.registers[1]
                         else:
                             raw_value = result.registers[0]
-                        scaled_value = (
-                            raw_value * HP_SENSOR_TEMPLATES[template_key]["scale"]
-                        )
-                        _LOGGER.debug(
-                            "Successfully read %s: %s (raw: %s)",
-                            sensor_id,
-                            scaled_value,
-                            raw_value,
-                        )
+                        scaled_value = raw_value * template["scale"]
                         data[sensor_id] = scaled_value
                     except Exception as ex:
                         _LOGGER.error(
@@ -180,6 +217,16 @@ class LambdaDataUpdateCoordinator(DataUpdateCoordinator):
                         _LOGGER.warning("No base address for Boiler %s", boil_idx)
                         continue
                     address += template["relative_address"]
+                    
+                    # Prüfe ob das Register deaktiviert ist
+                    if self.is_register_disabled(address):
+                        _LOGGER.debug(
+                            "Skipping disabled register %d for sensor %s",
+                            address,
+                            sensor_id
+                        )
+                        continue
+                        
                     count = 2 if template["data_type"] == "int32" else 1
                     try:
                         _LOGGER.debug(
@@ -196,21 +243,17 @@ class LambdaDataUpdateCoordinator(DataUpdateCoordinator):
                             self.slave_id,
                         )
                         if result.isError():
-                            _LOGGER.warning(f"Modbus error for {sensor_id}")
+                            _LOGGER.warning(
+                                "Modbus error for %s (address: %d)",
+                                sensor_id,
+                                address
+                            )
                             continue
                         if template["data_type"] == "int32":
-                            raw_value = (result.registers[0] << 16) | result.registers[
-                                1
-                            ]
+                            raw_value = (result.registers[0] << 16) | result.registers[1]
                         else:
                             raw_value = result.registers[0]
                         scaled_value = raw_value * template["scale"]
-                        _LOGGER.debug(
-                            "Successfully read %s: %s (raw: %s)",
-                            sensor_id,
-                            scaled_value,
-                            raw_value,
-                        )
                         data[sensor_id] = scaled_value
                     except Exception as ex:
                         _LOGGER.error(
@@ -228,19 +271,29 @@ class LambdaDataUpdateCoordinator(DataUpdateCoordinator):
                 HC_SENSOR_TEMPLATES, fw_version
             )
             for hc_idx in range(1, num_hc + 1):
-                _LOGGER.debug("Reading sensors for HC %s", hc_idx)
+                _LOGGER.debug("Reading sensors for Heating Circuit %s", hc_idx)
                 for template_key, template in compatible_hc_templates.items():
                     sensor_id = f"hc{hc_idx}_{template_key}"
                     address = HC_BASE_ADDRESS.get(hc_idx)
                     if address is None:
-                        _LOGGER.warning("No base address for HC %s", hc_idx)
+                        _LOGGER.warning("No base address for Heating Circuit %s", hc_idx)
                         continue
                     address += template["relative_address"]
+                    
+                    # Prüfe ob das Register deaktiviert ist
+                    if self.is_register_disabled(address):
+                        _LOGGER.debug(
+                            "Skipping disabled register %d for sensor %s",
+                            address,
+                            sensor_id
+                        )
+                        continue
+                        
                     count = 2 if template["data_type"] == "int32" else 1
                     try:
                         _LOGGER.debug(
-                            "Attempting to read Modbus register for HC sensor %s at "
-                            "address %d with count %d",
+                            "Attempting to read Modbus register for HC sensor %s "
+                            "at address %d with count %d",
                             sensor_id,
                             address,
                             count,
@@ -252,21 +305,17 @@ class LambdaDataUpdateCoordinator(DataUpdateCoordinator):
                             self.slave_id,
                         )
                         if result.isError():
-                            _LOGGER.warning(f"Modbus error for {sensor_id}")
+                            _LOGGER.warning(
+                                "Modbus error for %s (address: %d)",
+                                sensor_id,
+                                address
+                            )
                             continue
                         if template["data_type"] == "int32":
-                            raw_value = (result.registers[0] << 16) | result.registers[
-                                1
-                            ]
+                            raw_value = (result.registers[0] << 16) | result.registers[1]
                         else:
                             raw_value = result.registers[0]
                         scaled_value = raw_value * template["scale"]
-                        _LOGGER.debug(
-                            "Successfully read %s: %s (raw: %s)",
-                            sensor_id,
-                            scaled_value,
-                            raw_value,
-                        )
                         data[sensor_id] = scaled_value
                     except Exception as ex:
                         _LOGGER.error(
@@ -291,6 +340,16 @@ class LambdaDataUpdateCoordinator(DataUpdateCoordinator):
                         _LOGGER.warning("No base address for Buffer %s", buffer_idx)
                         continue
                     address += template["relative_address"]
+                    
+                    # Prüfe ob das Register deaktiviert ist
+                    if self.is_register_disabled(address):
+                        _LOGGER.debug(
+                            "Skipping disabled register %d for sensor %s",
+                            address,
+                            sensor_id
+                        )
+                        continue
+                        
                     count = 2 if template["data_type"] == "int32" else 1
                     try:
                         _LOGGER.debug(
@@ -307,21 +366,17 @@ class LambdaDataUpdateCoordinator(DataUpdateCoordinator):
                             self.slave_id,
                         )
                         if result.isError():
-                            _LOGGER.warning(f"Modbus error for {sensor_id}")
+                            _LOGGER.warning(
+                                "Modbus error for %s (address: %d)",
+                                sensor_id,
+                                address
+                            )
                             continue
                         if template["data_type"] == "int32":
-                            raw_value = (result.registers[0] << 16) | result.registers[
-                                1
-                            ]
+                            raw_value = (result.registers[0] << 16) | result.registers[1]
                         else:
                             raw_value = result.registers[0]
                         scaled_value = raw_value * template["scale"]
-                        _LOGGER.debug(
-                            "Successfully read %s: %s (raw: %s)",
-                            sensor_id,
-                            scaled_value,
-                            raw_value,
-                        )
                         data[sensor_id] = scaled_value
                     except Exception as ex:
                         _LOGGER.error(
@@ -348,11 +403,21 @@ class LambdaDataUpdateCoordinator(DataUpdateCoordinator):
                         _LOGGER.warning("No base address for Solar %s", solar_idx)
                         continue
                     address += template["relative_address"]
+                    
+                    # Prüfe ob das Register deaktiviert ist
+                    if self.is_register_disabled(address):
+                        _LOGGER.debug(
+                            "Skipping disabled register %d for sensor %s",
+                            address,
+                            sensor_id
+                        )
+                        continue
+                        
                     count = 2 if template["data_type"] == "int32" else 1
                     try:
                         _LOGGER.debug(
-                            "Attempting to read Modbus register for Solar sensor %s at "
-                            "address %d with count %d",
+                            "Attempting to read Modbus register for Solar sensor %s "
+                            "at address %d with count %d",
                             sensor_id,
                             address,
                             count,
@@ -364,21 +429,17 @@ class LambdaDataUpdateCoordinator(DataUpdateCoordinator):
                             self.slave_id,
                         )
                         if result.isError():
-                            _LOGGER.warning(f"Modbus error for {sensor_id}")
+                            _LOGGER.warning(
+                                "Modbus error for %s (address: %d)",
+                                sensor_id,
+                                address
+                            )
                             continue
                         if template["data_type"] == "int32":
-                            raw_value = (result.registers[0] << 16) | result.registers[
-                                1
-                            ]
+                            raw_value = (result.registers[0] << 16) | result.registers[1]
                         else:
                             raw_value = result.registers[0]
                         scaled_value = raw_value * template["scale"]
-                        _LOGGER.debug(
-                            "Successfully read %s: %s (raw: %s)",
-                            sensor_id,
-                            scaled_value,
-                            raw_value,
-                        )
                         data[sensor_id] = scaled_value
                     except Exception as ex:
                         _LOGGER.error(
@@ -390,16 +451,6 @@ class LambdaDataUpdateCoordinator(DataUpdateCoordinator):
 
             _LOGGER.debug("Solar sensor block finished")
             return data
-        except ModbusException as ex:
-            _LOGGER.error("Modbus error: %s", ex)
-            if self.client:
-                await self.hass.async_add_executor_job(self.client.close)
-                self.client = None
-            raise
         except Exception as ex:
-            _LOGGER.error("Exception in _async_update_data: %s", ex)
+            _LOGGER.error("Error updating data: %s", ex)
             raise
-        finally:
-            _LOGGER.debug(
-                "End of _async_update_data reached (after Boiler sensor block)"
-            )

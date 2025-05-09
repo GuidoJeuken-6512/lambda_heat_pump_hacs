@@ -5,11 +5,11 @@ from __future__ import annotations
 DOMAIN = "lambda_heat_pumps"
 ## disable this for production
 DEFAULT_NAME = "EU08L"
-DEFAULT_HOST = "192.168.178.125"
-DEFAULT_PORT = 502
-## enable this for production
-##DEFAULT_HOST = "IP_ADDRESS or hostname"
+##DEFAULT_HOST = "192.168.178.125"
 ##DEFAULT_PORT = 502
+## enable this for production
+DEFAULT_HOST = "IP_ADDRESS or hostname"
+DEFAULT_PORT = 502
 DEFAULT_SLAVE_ID = 1
 DEFAULT_FIRMWARE = "V0.0.3-3K"
 DEFAULT_ROOM_THERMOSTAT_CONTROL = False
@@ -863,7 +863,7 @@ HC_SENSOR_TEMPLATES = {
         "scale": 0.1,
         "precision": 1,
         "data_type": "int16",
-        "firmware_version": 1,
+        "firmware_version": 3,
         "device_type": "heating_circuit",
         "writeable": False,
     },
@@ -872,18 +872,6 @@ HC_SENSOR_TEMPLATES = {
 # General Sensors
 SENSOR_TYPES = {
     # General Ambient
-    "aaaadummy": {
-        "address": 10,
-        "name": "Dummy for FW Selction",
-        "unit": None,
-        "scale": 1,
-        "precision": 0,
-        "data_type": "int16",
-        "firmware_version": 2,
-        "device_type": "main",
-        "initial_value": 5,
-        "writeable": False,
-    },
     "ambient_error_number": {
         "address": 0,
         "name": "Ambient Error Number",
