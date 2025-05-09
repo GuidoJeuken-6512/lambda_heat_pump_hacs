@@ -5,11 +5,11 @@ from __future__ import annotations
 DOMAIN = "lambda_heat_pumps"
 ## disable this for production
 DEFAULT_NAME = "EU08L"
-##DEFAULT_HOST = "192.168.178.194"
-##DEFAULT_PORT = 5020
-## enable this for production
-DEFAULT_HOST = "IP_ADDRESS or hostname"
+DEFAULT_HOST = "192.168.178.125"
 DEFAULT_PORT = 502
+## enable this for production
+##DEFAULT_HOST = "IP_ADDRESS or hostname"
+##DEFAULT_PORT = 502
 DEFAULT_SLAVE_ID = 1
 DEFAULT_FIRMWARE = "V0.0.3-3K"
 DEFAULT_ROOM_THERMOSTAT_CONTROL = False
@@ -233,6 +233,7 @@ HP_SENSOR_TEMPLATES = {
         "data_type": "uint16",
         "firmware_version": 1,
         "device_type": "heat_pump",
+        "writeable": False,
     },
     "error_number": {
         "relative_address": 1,
@@ -243,6 +244,7 @@ HP_SENSOR_TEMPLATES = {
         "data_type": "int16",
         "firmware_version": 1,
         "device_type": "heat_pump",
+        "writeable": False,
     },
     "state": {
         "relative_address": 2,
@@ -253,6 +255,7 @@ HP_SENSOR_TEMPLATES = {
         "data_type": "uint16",
         "firmware_version": 1,
         "device_type": "heat_pump",
+        "writeable": False,
     },
     "operating_state": {
         "relative_address": 3,
@@ -263,6 +266,7 @@ HP_SENSOR_TEMPLATES = {
         "data_type": "uint16",
         "firmware_version": 1,
         "device_type": "heat_pump",
+        "writeable": False,
     },
     "flow_line_temperature": {
         "relative_address": 4,
@@ -273,6 +277,7 @@ HP_SENSOR_TEMPLATES = {
         "data_type": "int16",
         "firmware_version": 1,
         "device_type": "heat_pump",
+        "writeable": False,
     },
     "return_line_temperature": {
         "relative_address": 5,
@@ -283,6 +288,7 @@ HP_SENSOR_TEMPLATES = {
         "data_type": "int16",
         "firmware_version": 1,
         "device_type": "heat_pump",
+        "writeable": False,
     },
     "volume_flow_heat_sink": {
         "relative_address": 6,
@@ -293,6 +299,7 @@ HP_SENSOR_TEMPLATES = {
         "data_type": "int16",
         "firmware_version": 1,
         "device_type": "heat_pump",
+        "writeable": False,
     },
     "energy_source_inlet_temperature": {
         "relative_address": 7,
@@ -303,6 +310,7 @@ HP_SENSOR_TEMPLATES = {
         "data_type": "int16",
         "firmware_version": 1,
         "device_type": "heat_pump",
+        "writeable": False,
     },
     "energy_source_outlet_temperature": {
         "relative_address": 8,
@@ -313,6 +321,7 @@ HP_SENSOR_TEMPLATES = {
         "data_type": "int16",
         "firmware_version": 1,
         "device_type": "heat_pump",
+        "writeable": False,
     },
     "volume_flow_energy_source": {
         "relative_address": 9,
@@ -323,6 +332,7 @@ HP_SENSOR_TEMPLATES = {
         "data_type": "int16",
         "firmware_version": 1,
         "device_type": "heat_pump",
+        "writeable": False,
     },
     "compressor_unit_rating": {
         "relative_address": 10,
@@ -333,6 +343,7 @@ HP_SENSOR_TEMPLATES = {
         "data_type": "uint16",
         "firmware_version": 1,
         "device_type": "heat_pump",
+        "writeable": False,
     },
     "actual_heating_capacity": {
         "relative_address": 11,
@@ -343,6 +354,7 @@ HP_SENSOR_TEMPLATES = {
         "data_type": "int16",
         "firmware_version": 1,
         "device_type": "heat_pump",
+        "writeable": False,
     },
     "inverter_power_consumption": {
         "relative_address": 12,
@@ -353,6 +365,7 @@ HP_SENSOR_TEMPLATES = {
         "data_type": "int16",
         "firmware_version": 1,
         "device_type": "heat_pump",
+        "writeable": False,
     },
     "cop": {
         "relative_address": 13,
@@ -363,6 +376,7 @@ HP_SENSOR_TEMPLATES = {
         "data_type": "int16",
         "firmware_version": 1,
         "device_type": "heat_pump",
+        "writeable": False,
     },
     "request_type": {
         "relative_address": 15,
@@ -373,6 +387,7 @@ HP_SENSOR_TEMPLATES = {
         "data_type": "int16",
         "firmware_version": 1,
         "device_type": "heat_pump",
+        "writeable": False,
     },
     "requested_flow_line_temperature": {
         "relative_address": 16,
@@ -383,6 +398,7 @@ HP_SENSOR_TEMPLATES = {
         "data_type": "int16",
         "firmware_version": 1,
         "device_type": "heat_pump",
+        "writeable": False,
     },
     "requested_return_line_temperature": {
         "relative_address": 17,
@@ -393,6 +409,7 @@ HP_SENSOR_TEMPLATES = {
         "data_type": "int16",
         "firmware_version": 1,
         "device_type": "heat_pump",
+        "writeable": False,
     },
     "requested_flow_to_return_line_temperature_difference": {
         "relative_address": 18,
@@ -403,6 +420,7 @@ HP_SENSOR_TEMPLATES = {
         "data_type": "int16",
         "firmware_version": 1,
         "device_type": "heat_pump",
+        "writeable": False,
     },
     "relais_state_2nd_heating_stage": {
         "relative_address": 19,
@@ -413,6 +431,7 @@ HP_SENSOR_TEMPLATES = {
         "data_type": "int16",
         "firmware_version": 1,
         "device_type": "heat_pump",
+        "writeable": False,
     },
     "compressor_power_consumption_accumulated": {
         "relative_address": 20,
@@ -423,6 +442,7 @@ HP_SENSOR_TEMPLATES = {
         "data_type": "int32",
         "firmware_version": 1,
         "device_type": "heat_pump",
+        "writeable": False,
     },
     "compressor_thermal_energy_output_accumulated": {
         "relative_address": 22,
@@ -433,6 +453,7 @@ HP_SENSOR_TEMPLATES = {
         "data_type": "int32",
         "firmware_version": 1,
         "device_type": "heat_pump",
+        "writeable": False,
     },
 }
 
@@ -447,6 +468,7 @@ BOIL_SENSOR_TEMPLATES = {
         "data_type": "int16",
         "firmware_version": 1,
         "device_type": "boiler",
+        "writeable": False,
     },
     "operating_state": {
         "relative_address": 1,
@@ -457,6 +479,7 @@ BOIL_SENSOR_TEMPLATES = {
         "data_type": "uint16",
         "firmware_version": 1,
         "device_type": "boiler",
+        "writeable": False,
     },
     "actual_high_temperature": {
         "relative_address": 2,
@@ -467,6 +490,7 @@ BOIL_SENSOR_TEMPLATES = {
         "data_type": "int16",
         "firmware_version": 1,
         "device_type": "boiler",
+        "writeable": False,
     },
     "actual_low_temperature": {
         "relative_address": 3,
@@ -477,6 +501,7 @@ BOIL_SENSOR_TEMPLATES = {
         "data_type": "int16",
         "firmware_version": 1,
         "device_type": "boiler",
+        "writeable": False,
     },
     "target_high_temperature": {
         "relative_address": 50,
@@ -487,6 +512,7 @@ BOIL_SENSOR_TEMPLATES = {
         "data_type": "int16",
         "firmware_version": 1,
         "device_type": "boiler",
+        "writeable": True,
     },
     "actual_circulation_temp": {
         "relative_address": 4,
@@ -497,6 +523,7 @@ BOIL_SENSOR_TEMPLATES = {
         "data_type": "int16",
         "firmware_version": 1,
         "device_type": "boiler",
+        "writeable": False,
     },
     "actual_circulation_pump_state": {
         "relative_address": 5,
@@ -507,6 +534,7 @@ BOIL_SENSOR_TEMPLATES = {
         "data_type": "int16",
         "firmware_version": 1,
         "device_type": "boiler",
+        "writeable": False,
     },
     "maximum_boiler_temp": {
         "relative_address": 50,
@@ -517,6 +545,7 @@ BOIL_SENSOR_TEMPLATES = {
         "data_type": "int16",
         "firmware_version": 1,
         "device_type": "boiler",
+        "writeable": True,
     },
 }
 
@@ -531,6 +560,7 @@ BUFFER_SENSOR_TEMPLATES = {
         "data_type": "int16",
         "firmware_version": 1,
         "device_type": "buffer",
+        "writeable": False,
     },
     "operating_state": {
         "relative_address": 1,
@@ -541,6 +571,7 @@ BUFFER_SENSOR_TEMPLATES = {
         "data_type": "uint16",
         "firmware_version": 1,
         "device_type": "buffer",
+        "writeable": False,
     },
     "actual_high_temp": {
         "relative_address": 2,
@@ -551,6 +582,7 @@ BUFFER_SENSOR_TEMPLATES = {
         "data_type": "int16",
         "firmware_version": 1,
         "device_type": "buffer",
+        "writeable": False,
     },
     "actual_low_temp": {
         "relative_address": 3,
@@ -561,6 +593,7 @@ BUFFER_SENSOR_TEMPLATES = {
         "data_type": "int16",
         "firmware_version": 1,
         "device_type": "buffer",
+        "writeable": False,
     },
     "modbus_buffer_temp_high": {
         "relative_address": 4,
@@ -571,6 +604,7 @@ BUFFER_SENSOR_TEMPLATES = {
         "data_type": "int16",
         "firmware_version": 1,
         "device_type": "buffer",
+        "writeable": False,
     },
     "request_type": {
         "relative_address": 5,
@@ -581,6 +615,7 @@ BUFFER_SENSOR_TEMPLATES = {
         "data_type": "int16",
         "firmware_version": 1,
         "device_type": "buffer",
+        "writeable": False,
     },
     "request_flow_line_temp_setpoint": {
         "relative_address": 6,
@@ -591,6 +626,7 @@ BUFFER_SENSOR_TEMPLATES = {
         "data_type": "int16",
         "firmware_version": 1,
         "device_type": "buffer",
+        "writeable": False,
     },
     "request_return_line_temp_setpoint": {
         "relative_address": 7,
@@ -601,6 +637,7 @@ BUFFER_SENSOR_TEMPLATES = {
         "data_type": "int16",
         "firmware_version": 1,
         "device_type": "buffer",
+        "writeable": False,
     },
     "request_heat_sink_temp_diff_setpoint": {
         "relative_address": 8,
@@ -611,6 +648,7 @@ BUFFER_SENSOR_TEMPLATES = {
         "data_type": "int16",
         "firmware_version": 1,
         "device_type": "buffer",
+        "writeable": False,
     },
     "modbus_request_heating_capacity": {
         "relative_address": 9,
@@ -621,6 +659,7 @@ BUFFER_SENSOR_TEMPLATES = {
         "data_type": "int16",
         "firmware_version": 1,
         "device_type": "buffer",
+        "writeable": False,
     },
     "maximum_buffer_temp": {
         "relative_address": 50,
@@ -631,6 +670,7 @@ BUFFER_SENSOR_TEMPLATES = {
         "data_type": "int16",
         "firmware_version": 1,
         "device_type": "buffer",
+        "writeable": False,
     },
 }
 
@@ -645,6 +685,7 @@ SOLAR_SENSOR_TEMPLATES = {
         "data_type": "int16",
         "firmware_version": 1,
         "device_type": "solar",
+        "writeable": False,
     },
     "operating_state": {
         "relative_address": 1,
@@ -655,6 +696,7 @@ SOLAR_SENSOR_TEMPLATES = {
         "data_type": "uint16",
         "firmware_version": 1,
         "device_type": "solar",
+        "writeable": False,
     },
     "collector_temperature": {
         "relative_address": 2,
@@ -665,6 +707,7 @@ SOLAR_SENSOR_TEMPLATES = {
         "data_type": "int16",
         "firmware_version": 1,
         "device_type": "solar",
+        "writeable": False,
     },
     "storage_temperature": {
         "relative_address": 3,
@@ -675,6 +718,7 @@ SOLAR_SENSOR_TEMPLATES = {
         "data_type": "int16",
         "firmware_version": 1,
         "device_type": "solar",
+        "writeable": False,
     },
     "power_current": {
         "relative_address": 4,
@@ -685,6 +729,7 @@ SOLAR_SENSOR_TEMPLATES = {
         "data_type": "int16",
         "firmware_version": 1,
         "device_type": "solar",
+        "writeable": False,
     },
     "energy_total": {
         "relative_address": 5,
@@ -695,6 +740,7 @@ SOLAR_SENSOR_TEMPLATES = {
         "data_type": "int32",
         "firmware_version": 1,
         "device_type": "solar",
+        "writeable": False,
     },
 }
 
@@ -709,6 +755,7 @@ HC_SENSOR_TEMPLATES = {
         "data_type": "int16",
         "firmware_version": 1,
         "device_type": "heating_circuit",
+        "writeable": False,
     },
     "operating_state": {
         "relative_address": 1,
@@ -719,6 +766,7 @@ HC_SENSOR_TEMPLATES = {
         "data_type": "uint16",
         "firmware_version": 1,
         "device_type": "heating_circuit",
+        "writeable": False,
     },
     "flow_line_temperature": {
         "relative_address": 2,
@@ -729,6 +777,7 @@ HC_SENSOR_TEMPLATES = {
         "data_type": "int16",
         "firmware_version": 1,
         "device_type": "heating_circuit",
+        "writeable": False,
     },
     "return_line_temperature": {
         "relative_address": 3,
@@ -739,6 +788,7 @@ HC_SENSOR_TEMPLATES = {
         "data_type": "int16",
         "firmware_version": 1,
         "device_type": "heating_circuit",
+        "writeable": False,
     },
     "room_device_temperature": {
         "relative_address": 4,
@@ -749,6 +799,7 @@ HC_SENSOR_TEMPLATES = {
         "data_type": "int16",
         "firmware_version": 1,
         "device_type": "heating_circuit",
+        "writeable": False,
     },
     "set_flow_line_temperature": {
         "relative_address": 5,
@@ -759,6 +810,7 @@ HC_SENSOR_TEMPLATES = {
         "data_type": "int16",
         "firmware_version": 1,
         "device_type": "heating_circuit",
+        "writeable": False,
     },
     "operating_mode": {
         "relative_address": 6,
@@ -769,6 +821,7 @@ HC_SENSOR_TEMPLATES = {
         "data_type": "int16",
         "firmware_version": 1,
         "device_type": "heating_circuit",
+        "writeable": False,
     },
     "set_flow_line_offset_temperature": {
         "relative_address": 50,
@@ -779,6 +832,7 @@ HC_SENSOR_TEMPLATES = {
         "data_type": "int16",
         "firmware_version": 1,
         "device_type": "heating_circuit",
+        "writeable": False,
     },
     "target_room_temperature": {
         "relative_address": 51,
@@ -789,6 +843,7 @@ HC_SENSOR_TEMPLATES = {
         "data_type": "int16",
         "firmware_version": 1,
         "device_type": "heating_circuit",
+        "writeable": True,
     },
     "set_cooling_mode_room_temperature": {
         "relative_address": 52,
@@ -799,6 +854,7 @@ HC_SENSOR_TEMPLATES = {
         "data_type": "int16",
         "firmware_version": 1,
         "device_type": "heating_circuit",
+        "writeable": False,
     },
     "target_temp_flow_line": {
         "relative_address": 7,
@@ -809,6 +865,7 @@ HC_SENSOR_TEMPLATES = {
         "data_type": "int16",
         "firmware_version": 1,
         "device_type": "heating_circuit",
+        "writeable": False,
     },
 }
 
@@ -825,6 +882,7 @@ SENSOR_TYPES = {
         "firmware_version": 2,
         "device_type": "main",
         "initial_value": 5,
+        "writeable": False,
     },
     "ambient_error_number": {
         "address": 0,
@@ -835,6 +893,7 @@ SENSOR_TYPES = {
         "data_type": "int16",
         "firmware_version": 1,
         "device_type": "main",
+        "writeable": False,
     },
     "ambient_operating_state": {
         "address": 1,
@@ -845,6 +904,7 @@ SENSOR_TYPES = {
         "data_type": "uint16",
         "firmware_version": 1,
         "device_type": "main",
+        "writeable": False,
     },
     "ambient_temperature": {
         "address": 2,
@@ -855,6 +915,7 @@ SENSOR_TYPES = {
         "data_type": "int16",
         "firmware_version": 1,
         "device_type": "main",
+        "writeable": False,
     },
     "ambient_temperature_1h": {
         "address": 3,
@@ -865,6 +926,7 @@ SENSOR_TYPES = {
         "data_type": "int16",
         "firmware_version": 1,
         "device_type": "main",
+        "writeable": False,
     },
     "ambient_temperature_calculated": {
         "address": 4,
@@ -875,6 +937,7 @@ SENSOR_TYPES = {
         "data_type": "int16",
         "firmware_version": 1,
         "device_type": "main",
+        "writeable": False,
     },
     "emgr_error_number": {
         "address": 100,
@@ -885,6 +948,7 @@ SENSOR_TYPES = {
         "data_type": "int16",
         "firmware_version": 1,
         "device_type": "main",
+        "writeable": False,
     },
     "emgr_operating_state": {
         "address": 101,
@@ -895,6 +959,7 @@ SENSOR_TYPES = {
         "data_type": "uint16",
         "firmware_version": 1,
         "device_type": "main",
+        "writeable": False,
     },
     "emgr_actual_power": {
         "address": 102,
@@ -905,6 +970,7 @@ SENSOR_TYPES = {
         "data_type": "int16",
         "firmware_version": 1,
         "device_type": "main",
+        "writeable": False,
     },
     "emgr_actual_power_consumption": {
         "address": 103,
@@ -915,6 +981,7 @@ SENSOR_TYPES = {
         "data_type": "int16",
         "firmware_version": 1,
         "device_type": "main",
+        "writeable": False,
     },
     "emgr_power_consumption_setpoint": {
         "address": 104,
@@ -925,6 +992,7 @@ SENSOR_TYPES = {
         "data_type": "int16",
         "firmware_version": 1,
         "device_type": "main",
+        "writeable": False,
     },
 }
 

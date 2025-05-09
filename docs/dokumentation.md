@@ -1,5 +1,47 @@
 # Lambda Wärmepumpen Integration - Dokumentation
 
+## Modbus-Kommunikation
+
+Die Integration kommuniziert mit der Lambda WP über Modbus TCP/IP. Die Kommunikation erfolgt über folgende Modbus-Funktionscodes:
+
+- **Lesen von Registern**: Funktionscode 0x03 (Read Multiple Holding Registers)
+- **Schreiben von Registern**: Funktionscode 0x10 (Write Multiple Registers)
+
+### Register-Adressierung
+
+Die Register werden wie folgt adressiert:
+
+- Heat Pump: Basis-Adresse 4000
+- Boiler: Basis-Adresse 4100, 4200, 4300, 4400 (für bis zu 4 Boiler)
+- Heating Circuit: Basis-Adresse 5000, 5100, 5200, 5300 (für bis zu 4 Heizkreise)
+- Buffer: Basis-Adresse 6000, 6100, 6200, 6300 (für bis zu 4 Puffer)
+- Solar: Basis-Adresse 7000, 7100, 7200, 7300 (für bis zu 4 Solaranlagen)
+
+Die relative Adresse wird zur Basis-Adresse addiert, um die absolute Modbus-Registeradresse zu erhalten.
+
+### Register-Typen
+
+Die Integration unterstützt folgende Register-Typen:
+
+- **Read-Only**: Sensoren und Status-Informationen
+- **Read-Write**: Zieltemperaturen und Steuerungsparameter
+
+### Datenformate
+
+Die Register verwenden folgende Datenformate:
+
+- **int16**: 16-Bit vorzeichenbehaftete Ganzzahl
+- **uint16**: 16-Bit vorzeichenlose Ganzzahl
+- **float**: 32-Bit Fließkommazahl (zwei aufeinanderfolgende Register)
+
+### Skalierung
+
+Die Werte werden mit einem Skalierungsfaktor multipliziert, um die tatsächlichen Werte zu erhalten. Zum Beispiel:
+
+- Temperaturen: Skalierungsfaktor 0.1 (Register-Wert 250 = 25.0°C)
+- Drücke: Skalierungsfaktor 0.1 (Register-Wert 150 = 15.0 bar)
+- Volumenströme: Skalierungsfaktor 0.1 (Register-Wert 100 = 10.0 l/min)
+
 ## Struktur der Integration
 
 Die Integration besteht aus folgenden Hauptdateien:

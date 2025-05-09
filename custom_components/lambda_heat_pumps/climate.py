@@ -372,14 +372,22 @@ class LambdaClimateEntity(CoordinatorEntity, ClimateEntity):
                 )
                 return
 
+            # Check if the sensor is writeable
+            if not sensor_info.get("writeable", False):
+                _LOGGER.error(
+                    "Sensor %s is not writeable",
+                    self._target_temp_sensor,
+                )
+                return
+
             # Berechne den Rohwert für das Register
             raw_value = int(temperature / sensor_info["scale"])
 
-            # Schreibe den Wert in das Modbus-Register
+            # Schreibe den Wert in das Modbus-Register mit Holding Register Funktion
             result = await self.hass.async_add_executor_job(
-                self.coordinator.client.write_register,
+                self.coordinator.client.write_registers,
                 sensor_info["address"],
-                raw_value,
+                [raw_value],
                 self._entry.data.get("slave_id", 1)
             )
 
