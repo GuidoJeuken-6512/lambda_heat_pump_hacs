@@ -4,6 +4,7 @@ from datetime import timedelta
 import logging
 import os
 import yaml
+import aiofiles
 from homeassistant.core import HomeAssistant
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
@@ -19,7 +20,7 @@ from .const import (
     SOLAR_BASE_ADDRESS,
     FIRMWARE_VERSION,
 )
-from .utils import get_compatible_sensors
+from .utils import get_compatible_sensors, load_disabled_registers, is_register_disabled
 
 _LOGGER = logging.getLogger(__name__)
 SCAN_INTERVAL = timedelta(seconds=30)
@@ -53,29 +54,67 @@ class LambdaDataUpdateCoordinator(DataUpdateCoordinator):
             _LOGGER.setLevel(logging.DEBUG)
         self.client = None
         self.config_entry_id = entry.entry_id
-        
-        # Lade deaktivierte Register
         self.disabled_registers = set()
-        config_path = os.path.join(
-            os.path.dirname(__file__),
-            "disabled_registers.yaml"
+        self._config_dir = hass.config.config_dir
+        self._config_path = os.path.join(self._config_dir, "lambda_heat_pumps")
+        # Nutze die lokale Datei im Custom Component-Ordner
+        self._disabled_registers_path = os.path.join(
+            os.path.dirname(os.path.abspath(__file__)), "disabled_registers.yaml"
         )
-        if os.path.exists(config_path):
-            try:
-                with open(config_path, 'r') as file:
-                    config = yaml.safe_load(file)
-                    if config and 'disabled_registers' in config:
-                        self.disabled_registers = set(config['disabled_registers'])
-                        _LOGGER.debug(
-                            "Loaded disabled registers: %s",
-                            self.disabled_registers
-                        )
-            except Exception as ex:
-                _LOGGER.error("Error loading disabled registers: %s", ex)
+        self.hass = hass
+
+    async def async_init(self):
+        """Async initialization."""
+        _LOGGER.debug("Initializing Lambda coordinator")
+        _LOGGER.debug("Config directory: %s", self._config_dir)
+        _LOGGER.debug("Config path: %s", self._config_path)
+        _LOGGER.debug("Disabled registers path: %s", self._disabled_registers_path)
+
+        try:
+            await self._ensure_config_dir()
+            _LOGGER.debug("Config directory ensured")
+
+            self.disabled_registers = await load_disabled_registers(self.hass, self._disabled_registers_path)
+            _LOGGER.debug("Loaded disabled registers: %s", self.disabled_registers)
+
+            if not self.disabled_registers:
+                _LOGGER.debug("No disabled registers configured - this is normal if you haven't disabled any registers")
+        except Exception as e:
+            _LOGGER.error("Failed to initialize coordinator: %s", str(e))
+            self.disabled_registers = set()
+            raise
+
+    async def _ensure_config_dir(self):
+        """Ensure config directory exists."""
+        try:
+            def _create_dirs():
+                os.makedirs(self._config_dir, exist_ok=True)
+                os.makedirs(self._config_path, exist_ok=True)
+                _LOGGER.debug("Created directories: %s and %s", self._config_dir, self._config_path)
+
+            await self.hass.async_add_executor_job(_create_dirs)
+        except Exception as e:
+            _LOGGER.error("Failed to create config directories: %s", str(e))
+            raise
 
     def is_register_disabled(self, address: int) -> bool:
         """Check if a register is disabled."""
-        return address in self.disabled_registers
+        if not hasattr(self, 'disabled_registers'):
+            _LOGGER.error("disabled_registers not initialized")
+            return False
+
+        # Debug: Ausgabe der Typen und Inhalte
+        _LOGGER.debug(
+            "Check if address %r (type: %s) is in disabled_registers: %r (types: %r)",
+            address, type(address), self.disabled_registers, {type(x) for x in self.disabled_registers}
+        )
+
+        is_disabled = is_register_disabled(address, self.disabled_registers)
+        if is_disabled:
+            _LOGGER.debug("Register %d is disabled (in set: %s)", address, self.disabled_registers)
+        else:
+            _LOGGER.debug("Register %d is not disabled (checked against set: %s)", address, self.disabled_registers)
+        return is_disabled
 
     async def _async_update_data(self):
         """Fetch data from Lambda device."""
@@ -114,7 +153,7 @@ class LambdaDataUpdateCoordinator(DataUpdateCoordinator):
                             sensor_id
                         )
                         continue
-                        
+
                     _LOGGER.debug(
                         "Reading static sensor: %s with address: %d",
                         sensor_id,
@@ -152,12 +191,12 @@ class LambdaDataUpdateCoordinator(DataUpdateCoordinator):
                 _LOGGER.debug("Reading sensors for Heat Pump %s", hp_idx)
                 for template_key, template in compatible_hp_templates.items():
                     sensor_id = f"hp{hp_idx}_{template_key}"
-                    address = HP_BASE_ADDRESS.get(hp_idx)
-                    if address is None:
+                    base_address = HP_BASE_ADDRESS.get(hp_idx)
+                    if base_address is None:
                         _LOGGER.warning("No base address for Heat Pump %s", hp_idx)
                         continue
-                    address += template["relative_address"]
-                    
+                    address = base_address + template["relative_address"]
+
                     # Prüfe ob das Register deaktiviert ist
                     if self.is_register_disabled(address):
                         _LOGGER.debug(
@@ -166,7 +205,7 @@ class LambdaDataUpdateCoordinator(DataUpdateCoordinator):
                             sensor_id
                         )
                         continue
-                        
+
                     count = 2 if template["data_type"] == "int32" else 1
                     try:
                         _LOGGER.debug(
@@ -212,12 +251,12 @@ class LambdaDataUpdateCoordinator(DataUpdateCoordinator):
                 _LOGGER.debug("Reading sensors for Boiler %s", boil_idx)
                 for template_key, template in compatible_boil_templates.items():
                     sensor_id = f"boil{boil_idx}_{template_key}"
-                    address = BOIL_BASE_ADDRESS.get(boil_idx)
-                    if address is None:
+                    base_address = BOIL_BASE_ADDRESS.get(boil_idx)
+                    if base_address is None:
                         _LOGGER.warning("No base address for Boiler %s", boil_idx)
                         continue
-                    address += template["relative_address"]
-                    
+                    address = base_address + template["relative_address"]
+
                     # Prüfe ob das Register deaktiviert ist
                     if self.is_register_disabled(address):
                         _LOGGER.debug(
@@ -226,7 +265,7 @@ class LambdaDataUpdateCoordinator(DataUpdateCoordinator):
                             sensor_id
                         )
                         continue
-                        
+
                     count = 2 if template["data_type"] == "int32" else 1
                     try:
                         _LOGGER.debug(
@@ -279,7 +318,7 @@ class LambdaDataUpdateCoordinator(DataUpdateCoordinator):
                         _LOGGER.warning("No base address for Heating Circuit %s", hc_idx)
                         continue
                     address += template["relative_address"]
-                    
+
                     # Prüfe ob das Register deaktiviert ist
                     if self.is_register_disabled(address):
                         _LOGGER.debug(
@@ -288,7 +327,7 @@ class LambdaDataUpdateCoordinator(DataUpdateCoordinator):
                             sensor_id
                         )
                         continue
-                        
+
                     count = 2 if template["data_type"] == "int32" else 1
                     try:
                         _LOGGER.debug(
@@ -340,7 +379,7 @@ class LambdaDataUpdateCoordinator(DataUpdateCoordinator):
                         _LOGGER.warning("No base address for Buffer %s", buffer_idx)
                         continue
                     address += template["relative_address"]
-                    
+
                     # Prüfe ob das Register deaktiviert ist
                     if self.is_register_disabled(address):
                         _LOGGER.debug(
@@ -349,7 +388,7 @@ class LambdaDataUpdateCoordinator(DataUpdateCoordinator):
                             sensor_id
                         )
                         continue
-                        
+
                     count = 2 if template["data_type"] == "int32" else 1
                     try:
                         _LOGGER.debug(
@@ -403,7 +442,7 @@ class LambdaDataUpdateCoordinator(DataUpdateCoordinator):
                         _LOGGER.warning("No base address for Solar %s", solar_idx)
                         continue
                     address += template["relative_address"]
-                    
+
                     # Prüfe ob das Register deaktiviert ist
                     if self.is_register_disabled(address):
                         _LOGGER.debug(
@@ -412,7 +451,7 @@ class LambdaDataUpdateCoordinator(DataUpdateCoordinator):
                             sensor_id
                         )
                         continue
-                        
+
                     count = 2 if template["data_type"] == "int32" else 1
                     try:
                         _LOGGER.debug(
