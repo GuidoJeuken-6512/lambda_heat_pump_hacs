@@ -31,7 +31,7 @@ from .const import (
     BOIL_BASE_ADDRESS,
     HC_BASE_ADDRESS,
 )
-from .utils import build_device_info
+from .utils import build_device_info, is_register_disabled
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -138,6 +138,18 @@ async def async_setup_entry(
         hw_target_temp_sensor = (
             f"boil{boil_idx}_target_high_temperature"
         )
+        
+        # Prüfe ob die relevanten Register deaktiviert sind
+        current_temp_address = BOIL_BASE_ADDRESS[boil_idx] + BOIL_SENSOR_TEMPLATES["actual_high_temperature"]["relative_address"]
+        target_temp_address = BOIL_BASE_ADDRESS[boil_idx] + BOIL_SENSOR_TEMPLATES["target_high_temperature"]["relative_address"]
+        
+        if is_register_disabled(current_temp_address, coordinator.disabled_registers) or is_register_disabled(target_temp_address, coordinator.disabled_registers):
+            _LOGGER.debug(
+                "Skipping hot water climate entity for Boil%d due to disabled registers",
+                boil_idx
+            )
+            continue
+            
         if (
             is_sensor_compatible(hw_current_temp_sensor)
             and is_sensor_compatible(hw_target_temp_sensor)
@@ -181,6 +193,18 @@ async def async_setup_entry(
             hc_target_temp_sensor = (
                 f"hc{hc_idx}_target_room_temperature"
             )
+            
+            # Prüfe ob die relevanten Register deaktiviert sind
+            current_temp_address = HC_BASE_ADDRESS[hc_idx] + HC_SENSOR_TEMPLATES["room_device_temperature"]["relative_address"]
+            target_temp_address = HC_BASE_ADDRESS[hc_idx] + HC_SENSOR_TEMPLATES["target_room_temperature"]["relative_address"]
+            
+            if is_register_disabled(current_temp_address, coordinator.disabled_registers) or is_register_disabled(target_temp_address, coordinator.disabled_registers):
+                _LOGGER.debug(
+                    "Skipping heating circuit climate entity for HC%d due to disabled registers",
+                    hc_idx
+                )
+                continue
+                
             if (
                 is_sensor_compatible(hc_current_temp_sensor)
                 and is_sensor_compatible(hc_target_temp_sensor)

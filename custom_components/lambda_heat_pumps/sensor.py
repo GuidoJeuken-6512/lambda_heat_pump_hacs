@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 import logging
-from typing import Any
+from typing import Any, Dict, Optional
 
 from homeassistant.components.sensor import (
     SensorDeviceClass,
@@ -11,6 +11,7 @@ from homeassistant.components.sensor import (
 )
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
@@ -32,10 +33,10 @@ from .const import (
     BUFFER_OPERATION_STATE,
     BUFFER_REQUEST_TYPE,
 )
+from .coordinator import LambdaDataUpdateCoordinator
 from .utils import get_compatible_sensors, build_device_info
 
 _LOGGER = logging.getLogger(__name__)
-
 
 async def async_setup_entry(
     hass: HomeAssistant,
@@ -65,6 +66,15 @@ async def async_setup_entry(
 
     compatible_static_sensors = get_compatible_sensors(SENSOR_TYPES, fw_version)
     for sensor_id, sensor_config in compatible_static_sensors.items():
+        # Prüfe ob das Register deaktiviert ist
+        if coordinator.is_register_disabled(sensor_config["address"]):
+            _LOGGER.debug(
+                "Skipping disabled register %d for sensor %s",
+                sensor_config["address"],
+                sensor_id
+            )
+            continue
+
         sensor_fw = sensor_config.get("firmware_version", 1)
         is_compatible = sensor_fw <= fw_version
         _LOGGER.debug(
@@ -106,6 +116,16 @@ async def async_setup_entry(
         for template_key, template in compatible_hp_templates.items():
             sensor_id = f"hp{hp_idx}_{template_key}"
             address = HP_BASE_ADDRESS[hp_idx] + template["relative_address"]
+            
+            # Prüfe ob das Register deaktiviert ist
+            if coordinator.is_register_disabled(address):
+                _LOGGER.debug(
+                    "Skipping disabled register %d for sensor %s",
+                    address,
+                    sensor_id
+                )
+                continue
+
             sensor_config = template.copy()
             sensor_config["address"] = address
             sensor_config["name"] = (
@@ -142,6 +162,16 @@ async def async_setup_entry(
         for template_key, template in compatible_boil_templates.items():
             sensor_id = f"boil{boil_idx}_{template_key}"
             address = BOIL_BASE_ADDRESS[boil_idx] + template["relative_address"]
+            
+            # Prüfe ob das Register deaktiviert ist
+            if coordinator.is_register_disabled(address):
+                _LOGGER.debug(
+                    "Skipping disabled register %d for sensor %s",
+                    address,
+                    sensor_id
+                )
+                continue
+
             sensor_config = template.copy()
             sensor_config["address"] = address
             orig_name = template["name"].replace("Boiler ", "")
@@ -182,6 +212,14 @@ async def async_setup_entry(
         for template_key, template in compatible_hc_templates.items():
             sensor_id = f"hc{hc_idx}_{template_key}"
             address = HC_BASE_ADDRESS[hc_idx] + template["relative_address"]
+            # Prüfe ob das Register deaktiviert ist
+            if coordinator.is_register_disabled(address):
+                _LOGGER.debug(
+                    "Skipping disabled register %d for sensor %s",
+                    address,
+                    sensor_id
+                )
+                continue
             sensor_config = template.copy()
             sensor_config["address"] = address
             sensor_config["name"] = (
@@ -222,6 +260,14 @@ async def async_setup_entry(
             sensor_id = f"buffer{buffer_idx}_{template_key}"
             base_addr = BUFFER_BASE_ADDRESS.get(buffer_idx, 3000)
             address = base_addr + template["relative_address"]
+            # Prüfe ob das Register deaktiviert ist
+            if coordinator.is_register_disabled(address):
+                _LOGGER.debug(
+                    "Skipping disabled register %d for sensor %s",
+                    address,
+                    sensor_id
+                )
+                continue
             sensor_config = template.copy()
             sensor_config["address"] = address
             sensor_config["name"] = (
@@ -263,6 +309,14 @@ async def async_setup_entry(
             sensor_id = f"solar{solar_idx}_{template_key}"
             base_addr = SOLAR_BASE_ADDRESS.get(solar_idx, 4000)
             address = base_addr + template["relative_address"]
+            # Prüfe ob das Register deaktiviert ist
+            if coordinator.is_register_disabled(address):
+                _LOGGER.debug(
+                    "Skipping disabled register %d for sensor %s",
+                    address,
+                    sensor_id
+                )
+                continue
             sensor_config = template.copy()
             sensor_config["address"] = address
             sensor_config["name"] = (
@@ -302,10 +356,10 @@ class LambdaSensor(CoordinatorEntity, SensorEntity):
 
     def __init__(
         self,
-        coordinator,
+        coordinator: LambdaDataUpdateCoordinator,
         entry: ConfigEntry,
         sensor_id: str,
-        sensor_config: dict[str, Any],
+        sensor_config: Dict[str, Any],
     ) -> None:
         """Initialize the sensor."""
         super().__init__(coordinator)
