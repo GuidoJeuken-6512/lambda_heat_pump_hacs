@@ -407,6 +407,13 @@ class LambdaSensor(CoordinatorEntity, SensorEntity):
             elif sensor_config["unit"] == "Wh":
                 self._attr_device_class = SensorDeviceClass.ENERGY
                 self._attr_state_class = SensorStateClass.TOTAL_INCREASING
+            
+            # Set state_class from template if available
+            if "state_class" in sensor_config:
+                if sensor_config["state_class"] == "total":
+                    self._attr_state_class = SensorStateClass.TOTAL
+                elif sensor_config["state_class"] == "total_increasing":
+                    self._attr_state_class = SensorStateClass.TOTAL_INCREASING
 
     @property
     def native_value(self) -> float | str | None:

@@ -13,6 +13,7 @@ from homeassistant.const import ATTR_TEMPERATURE
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
+from homeassistant.components.sensor import SensorStateClass
 
 from .const import (
     DOMAIN,
@@ -254,6 +255,7 @@ class LambdaClimateEntity(CoordinatorEntity, ClimateEntity):
     _attr_hvac_modes = [HVACMode.HEAT]  # Nur HEAT-Modus
     _attr_hvac_mode = HVACMode.HEAT  # Immer im HEAT-Modus
     _attr_firmware_version = 1
+    _attr_state_class = SensorStateClass.TOTAL
 
     def __init__(
         self,
@@ -295,6 +297,7 @@ class LambdaClimateEntity(CoordinatorEntity, ClimateEntity):
         self._attr_min_temp = min_temp
         self._attr_max_temp = max_temp
         self._attr_target_temperature_step = temp_step
+        self._attr_name = entry.data.get("name", "lambda")
         _LOGGER.debug(
             "Climate entity initialized with min_temp: %s, max_temp: %s",
             min_temp,
