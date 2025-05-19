@@ -5,10 +5,10 @@ from __future__ import annotations
 DOMAIN = "lambda_heat_pumps"
 ## disable this for production
 DEFAULT_NAME = "EU08L"
-##DEFAULT_HOST = "192.168.178.125"
+DEFAULT_HOST = "192.168.178.125"
 ##DEFAULT_PORT = 502
 ## enable this for production
-DEFAULT_HOST = "IP_ADDRESS or hostname"
+## DEFAULT_HOST = "IP_ADDRESS or hostname"
 DEFAULT_PORT = 502
 DEFAULT_SLAVE_ID = 1
 DEFAULT_FIRMWARE = "V0.0.3-3K"
@@ -18,8 +18,8 @@ DEFAULT_ROOM_THERMOSTAT_CONTROL = False
 DEFAULT_NUM_HPS = 1
 DEFAULT_NUM_BOIL = 1
 DEFAULT_NUM_HC = 1
-DEFAULT_NUM_BUFFER = 1
-DEFAULT_NUM_SOLAR = 1
+DEFAULT_NUM_BUFFER = 0
+DEFAULT_NUM_SOLAR = 0
 
 # Default temperature settings
 DEFAULT_HOT_WATER_MIN_TEMP = 40
@@ -28,6 +28,7 @@ DEFAULT_HOT_WATER_MAX_TEMP = 60
 # Configuration Constants
 CONF_SLAVE_ID = "slave_id"
 CONF_ROOM_TEMPERATURE_ENTITY = "room_temperature_entity_{0}"
+CONF_USE_MODBUS_NAMES = "use_modbus_names"
 # Format string for room_temperature_entity_1, _2, etc.
 
 # Debug and Logging

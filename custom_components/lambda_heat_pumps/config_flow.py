@@ -37,6 +37,7 @@ from .const import (
     CONF_SLAVE_ID,
     FIRMWARE_VERSION,
     CONF_ROOM_TEMPERATURE_ENTITY,
+    CONF_USE_MODBUS_NAMES,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -234,6 +235,16 @@ class LambdaConfigFlow(ConfigFlow, domain=DOMAIN):
                                 mode=selector.NumberSelectorMode.BOX,
                             )
                         ),
+                        vol.Required(
+                            CONF_USE_MODBUS_NAMES,
+                            default=user_input.get(
+                                CONF_USE_MODBUS_NAMES,
+                                existing_data.get(
+                                    CONF_USE_MODBUS_NAMES,
+                                    False
+                                ),
+                            ),
+                        ): selector.BooleanSelector(),
                         vol.Optional(
                             "firmware_version",
                             default=user_input.get(
@@ -323,6 +334,7 @@ class LambdaConfigFlow(ConfigFlow, domain=DOMAIN):
                             DEFAULT_FIRMWARE
                         ),
                     ),
+                    "use_modbus_names": user_input.get(CONF_USE_MODBUS_NAMES, False),
                 }
                 _LOGGER.debug(
                     "ConfigFlow: Erstelle neuen Eintrag mit data=%s, options=%s",
